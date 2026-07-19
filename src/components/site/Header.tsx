@@ -8,6 +8,7 @@ import logoAsset from "@/assets/promows-logo.png.asset.json";
 const nav = [
   { to: "/", label: "Home" },
   { to: "/services", label: "Services" },
+  { to: "/blog", label: "Blog" },
   { to: "/about", label: "About" },
   { to: "/partners", label: "Partners" },
   { to: "/contact", label: "Contact" },
