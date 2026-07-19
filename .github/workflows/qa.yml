@@ -2,12 +2,22 @@ name: QA — mailto & JSON-LD
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
+    inputs:
+      preview_url:
+        description: Preview URL to test (overrides auto-detection)
+        required: false
+
+concurrency:
+  group: qa-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   qa:
+    if: github.event.pull_request.draft != true
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -24,73 +34,96 @@ jobs:
       - name: Install Playwright Chromium
         run: bunx playwright install --with-deps chromium
 
-      - name: Build
-        run: bun run build
-
-      - name: Start preview server
+      - name: Resolve preview URL
+        id: preview
+        env:
+          MANUAL: ${{ github.event.inputs.preview_url }}
+          # Optional org secret: stable Lovable preview URL for this project.
+          LOVABLE_PREVIEW_URL: ${{ secrets.LOVABLE_PREVIEW_URL }}
         run: |
-          bun run preview --port 8080 &
-          echo $! > .preview.pid
-          for i in {1..40}; do
-            if curl -sfo /dev/null http://localhost:8080/; then
-              echo "preview up"; exit 0
+          URL="${MANUAL:-$LOVABLE_PREVIEW_URL}"
+          if [ -z "$URL" ]; then
+            echo "::error::No preview URL configured. Set the LOVABLE_PREVIEW_URL secret or pass preview_url via workflow_dispatch."
+            exit 1
+          fi
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "Testing against $URL"
+
+      - name: Wait for preview to be reachable
+        env:
+          BASE_URL: ${{ steps.preview.outputs.url }}
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sfo /dev/null "$BASE_URL/"; then
+              echo "preview reachable"; exit 0
             fi
-            sleep 1
+            sleep 5
           done
-          echo "preview failed to start"; exit 1
+          echo "::error::Preview not reachable at $BASE_URL"; exit 1
 
       - name: qa:mailto
         id: qa_mailto
         env:
-          BASE_URL: http://localhost:8080
+          BASE_URL: ${{ steps.preview.outputs.url }}
         run: node scripts/qa-mailto.mjs
 
       - name: qa:jsonld
         id: qa_jsonld
         if: always()
         env:
-          BASE_URL: http://localhost:8080
+          BASE_URL: ${{ steps.preview.outputs.url }}
         run: node scripts/verify-jsonld.mjs
 
-      - name: Stop preview server
-        if: always()
-        run: kill "$(cat .preview.pid)" || true
-
       - name: Upload QA failure artifacts
+        id: upload
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: qa-reports
+          name: qa-reports-pr-${{ github.event.pull_request.number || github.run_id }}
           path: qa-reports/
           if-no-files-found: ignore
 
       - name: Comment failing routes on PR
         if: failure() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
+        env:
+          PREVIEW_URL: ${{ steps.preview.outputs.url }}
+          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         with:
           script: |
             const fs = require('fs');
             const path = require('path');
-            const lines = ['### QA failures'];
-            const mailto = 'qa-reports/mailto/summary.json';
-            if (fs.existsSync(mailto)) {
-              const j = JSON.parse(fs.readFileSync(mailto, 'utf8'));
-              lines.push('', '**mailto (info@promows.com) not visible:**');
-              for (const f of j.failures) {
-                lines.push(`- \`[${f.breakpoint}] ${f.route}\` → ${f.region}: ${f.reason}`);
+            const preview = process.env.PREVIEW_URL;
+            const artifactUrl = process.env.ARTIFACT_URL || process.env.RUN_URL;
+            const lines = [`### QA failures against \`${preview}\``];
+
+            const mailtoSummary = 'qa-reports/mailto/summary.json';
+            if (fs.existsSync(mailtoSummary)) {
+              const j = JSON.parse(fs.readFileSync(mailtoSummary, 'utf8'));
+              if (j.failures?.length) {
+                lines.push('', '**mailto (info@promows.com) not visible:**');
+                for (const f of j.failures) {
+                  lines.push(`- [\`${f.breakpoint}\` ${f.route} → ${f.region}](${preview}${f.route}) — HTTP ${f.status ?? '?'} — ${f.reason}${f.artifact ? ` — 📸 \`${f.artifact}\`` : ''}`);
+                }
               }
             }
-            const jsonldDir = 'qa-reports/jsonld';
-            if (fs.existsSync(jsonldDir)) {
-              const files = fs.readdirSync(jsonldDir).filter(f => f.endsWith('.json'));
-              if (files.length) lines.push('', '**JSON-LD schema failures:**');
-              for (const f of files) {
-                const j = JSON.parse(fs.readFileSync(path.join(jsonldDir, f), 'utf8'));
-                lines.push(`- \`${j.path}\` (HTTP ${j.status}) — ${j.reason}`);
+
+            const jsonldSummary = 'qa-reports/jsonld/summary.json';
+            if (fs.existsSync(jsonldSummary)) {
+              const j = JSON.parse(fs.readFileSync(jsonldSummary, 'utf8'));
+              if (j.failures?.length) {
+                lines.push('', '**JSON-LD schema failures (raw SSR HTML):**');
+                for (const f of j.failures) {
+                  const names = f.failedAssertions.map(a => `\`${a.name}\`: ${a.detail}`).join('; ');
+                  lines.push(`- [${f.path}](${f.url}) — HTTP ${f.status} — types=[${(f.entityTypes||[]).join(',')}] — ${names}`);
+                }
               }
             }
-            if (lines.length === 1) lines.push('', '_No structured failure summary produced — check job logs._');
-            lines.push('', '_Artifacts uploaded as `qa-reports`._');
+
+            if (lines.length === 1) lines.push('', '_No structured failure summary produced — see job logs._');
+            lines.push('', `📦 [Download artifacts](${artifactUrl}) · 🔗 [Full run](${process.env.RUN_URL})`);
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
