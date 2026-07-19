@@ -274,13 +274,15 @@ for (const path of urls) {
   const result =
     status === 200
       ? assertRoute(path, html)
-      : { ok: false, entityTypes: [], assertions: [{ name: "http", ok: false, detail: `HTTP ${status}` }], routeKind: path.startsWith("/city/") ? "city" : "blog" };
+      : { ok: false, entityTypes: [], assertions: [{ name: "http", ok: false, detail: `HTTP ${status}` }],
+          rawBlocks: [], routeKind: path.startsWith("/city/") ? "city" : "blog" };
+
+  const slug = slugify(path);
+  await writeFile(join(SNAPSHOT_DIR, `${slug}.json`),
+    JSON.stringify({ path, url, blocks: result.rawBlocks ?? [] }, null, 2));
 
   const record = {
-    base: BASE,
-    url,
-    path,
-    status,
+    base: BASE, url, path, status,
     routeKind: result.routeKind,
     entityTypes: result.entityTypes,
     ok: result.ok,
@@ -289,15 +291,60 @@ for (const path of urls) {
   };
   allResults.push(record);
   await appendFile(NDJSON, JSON.stringify(record) + "\n");
-  await writeFile(join(REPORT_DIR, `${slugify(path)}.json`), JSON.stringify(record, null, 2));
+  await writeFile(join(REPORT_DIR, `${slug}.json`), JSON.stringify(record, null, 2));
 
   if (result.ok) {
     console.log(`PASS ${path}  [${status}] types=${result.entityTypes.join(",")}`);
   } else {
     const reasons = record.failedAssertions.map((a) => `${a.name}: ${a.detail}`).join(" | ");
     console.log(`FAIL ${path}  [${status}] ${reasons}`);
-    await writeFile(join(REPORT_DIR, `${slugify(path)}.html`), html.slice(0, 20000));
+    await writeFile(join(REPORT_DIR, `${slug}.html`), html.slice(0, 20000));
     failures.push(record);
+  }
+}
+
+// --- diff snapshots vs previous run --------------------------------------
+async function diffSnapshots() {
+  if (!existsSync(PREV_SNAPSHOT_DIR)) return null;
+  const [prevFiles, currFiles] = await Promise.all([
+    readdir(PREV_SNAPSHOT_DIR), readdir(SNAPSHOT_DIR),
+  ]);
+  const load = async (dir, f) => JSON.parse(await readFile(join(dir, f), "utf8"));
+  const prevMap = new Map();
+  for (const f of prevFiles) { const j = await load(PREV_SNAPSHOT_DIR, f); prevMap.set(j.path, j); }
+  const currMap = new Map();
+  for (const f of currFiles) { const j = await load(SNAPSHOT_DIR, f); currMap.set(j.path, j); }
+
+  const added = [], removed = [], changed = [];
+  for (const [p, c] of currMap) {
+    const prev = prevMap.get(p);
+    if (!prev) { added.push(p); continue; }
+    if (JSON.stringify(prev.blocks) !== JSON.stringify(c.blocks)) {
+      const gone = prev.blocks.filter((x) => !c.blocks.includes(x));
+      const fresh = c.blocks.filter((x) => !prev.blocks.includes(x));
+      changed.push({ path: p, removedBlocks: gone.length, addedBlocks: fresh.length,
+        sample: { removed: gone[0]?.slice(0, 400), added: fresh[0]?.slice(0, 400) } });
+    }
+  }
+  for (const p of prevMap.keys()) if (!currMap.has(p)) removed.push(p);
+  return { added, removed, changed };
+}
+const diff = await diffSnapshots();
+if (diff) {
+  await writeFile(join(REPORT_DIR, "diff.json"), JSON.stringify(diff, null, 2));
+  const lines = [
+    `JSON-LD diff vs previous run (base=${BASE})`,
+    `  routes added:   ${diff.added.length}`,
+    `  routes removed: ${diff.removed.length}`,
+    `  routes changed: ${diff.changed.length}`,
+    "",
+    ...diff.changed.map((c) => `~ ${c.path}  (+${c.addedBlocks} / -${c.removedBlocks} JSON-LD block(s))`),
+    ...diff.added.map((p) => `+ ${p}`),
+    ...diff.removed.map((p) => `- ${p}`),
+  ];
+  await writeFile(join(REPORT_DIR, "diff.txt"), lines.join("\n"));
+  if (diff.added.length || diff.removed.length || diff.changed.length) {
+    console.log(`\nDiff vs previous run: +${diff.added.length} -${diff.removed.length} ~${diff.changed.length}  (see diff.txt)`);
   }
 }
 
