@@ -109,29 +109,19 @@ function HomePage() {
             </ul>
           </div>
 
-          <div className="relative min-h-[420px] md:min-h-[520px]">
-            <div className="absolute inset-2 overflow-hidden rounded-[2.5rem] ring-1 ring-primary/20 shadow-2xl" aria-hidden>
+          <div className="relative">
+            <div className="overflow-hidden rounded-[2.5rem] ring-1 ring-primary/20 shadow-2xl">
               <img
-                src={heroCrewBg}
-                alt=""
+                src={heroSquare.url}
+                alt="ProMows Lawn Care truck and trailer parked at a beautifully landscaped property"
                 className="h-full w-full object-cover"
-                width={1920}
-                height={1280}
+                width={1024}
+                height={1024}
                 loading="eager"
+                fetchPriority="high"
               />
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/40 via-primary/10 to-transparent mix-blend-multiply" />
-              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/60 to-transparent" />
             </div>
-            <img
-              src={truckAsset.url}
-              alt="ProMows lawn care truck with green grass wrap"
-              className="absolute -bottom-6 -right-6 w-[110%] max-w-none drop-shadow-2xl md:w-[120%]"
-              width={1024}
-              height={1024}
-              loading="eager"
-              fetchPriority="high"
-            />
-            <div className="absolute bottom-4 left-4 grid grid-cols-1 gap-3 text-sm">
+            <div className="absolute bottom-4 left-4 grid grid-cols-2 gap-3 text-sm">
               <div className="rounded-xl bg-background/90 p-3 shadow-lg backdrop-blur">
                 <div className="text-2xl font-extrabold text-primary">4.9★</div>
                 <div className="text-xs text-muted-foreground">Avg. rating</div>
