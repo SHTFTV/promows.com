@@ -5,6 +5,7 @@ export const site = {
   phone: "(000) 000-0000",
   email: "hello@promows.com",
   serviceArea: "North America",
+  locale: "en_US",
   partner: {
     name: "PlowWow",
     domain: "plowwow.com",
@@ -19,6 +20,20 @@ export const SITE_URL = `https://${site.domain}`;
 export const LOGO_URL = `${SITE_URL}/android-chrome-512x512.png`;
 export const OG_IMAGE_URL = `${SITE_URL}/og-image.png`;
 
+/**
+ * Build canonical + hreflang link tags for a route.
+ * ProMows is currently single-locale (en-US). Both self-referencing
+ * hreflang tags (`en` and `x-default`) point to the same absolute URL so
+ * search engines don't treat any variant as a duplicate.
+ */
+export const seoLinks = (path: string) => {
+  const href = `${SITE_URL}${path}`;
+  return [
+    { rel: "canonical", href },
+    { rel: "alternate", hrefLang: "en", href },
+    { rel: "alternate", hrefLang: "x-default", href },
+  ];
+};
 
 export type ServiceSlug =
   | "mowing"
