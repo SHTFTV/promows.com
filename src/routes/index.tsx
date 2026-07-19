@@ -172,10 +172,10 @@ function HomePage() {
                 Claim your neighborhood from just $10/month
               </h2>
               <p className="mt-1 text-sm opacity-90 md:text-base">
-                Exclusive — one household per block locks in founding pricing before we open your area.{" "}
-                <a href="#founding-faq" className="underline decoration-2 underline-offset-2 hover:opacity-100">
+                <a href="#founding-faq" className="font-semibold underline decoration-2 underline-offset-2 hover:opacity-100">
                   Exclusive Territories
-                </a>
+                </a>{" "}
+                — Reliable crews, solo operators, and landscape pros — bring your standards, we'll bring the routes and steady work.
               </p>
             </div>
           </div>
