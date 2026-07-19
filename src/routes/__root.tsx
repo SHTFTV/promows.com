@@ -133,6 +133,29 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           description:
             "Professional lawn and landscape care — mowing, landscape design, hedge and tree trimming, yard cleanups, and fertilization across North America.",
           areaServed: site.serviceArea,
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: site.address.locality,
+            addressRegion: site.address.region,
+            postalCode: site.address.postalCode,
+            addressCountry: site.address.country,
+          },
+          contactPoint: [
+            {
+              "@type": "ContactPoint",
+              contactType: "customer support",
+              email: site.email,
+              areaServed: site.serviceArea,
+              availableLanguage: ["English"],
+            },
+            {
+              "@type": "ContactPoint",
+              contactType: "sales",
+              email: site.email,
+              areaServed: site.serviceArea,
+              availableLanguage: ["English"],
+            },
+          ],
           sameAs: [site.partner.url],
         }),
       },

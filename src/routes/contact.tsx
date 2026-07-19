@@ -87,9 +87,21 @@ function Contact() {
         <aside className="space-y-4">
           <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
             <h2 className="font-heading text-lg font-bold">Direct</h2>
-            <ul className="mt-3 space-y-2 text-sm">
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-primary" /> <a href={`mailto:${site.email}`} className="hover:underline">{site.email}</a></li>
-              <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /> {site.serviceArea}</li>
+            <ul className="mt-3 space-y-3 text-sm">
+              <li className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-primary" />
+                <a href={`mailto:${site.email}`} className="hover:underline">{site.email}</a>
+              </li>
+              <li className="flex items-start gap-2">
+                <MapPin className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <address className="not-italic">
+                  <div className="font-semibold">{site.address.locality}</div>
+                  <div className="text-muted-foreground">{site.address.line}</div>
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    Serving {site.serviceArea}. A local dispatch address will be listed here as regions open.
+                  </div>
+                </address>
+              </li>
             </ul>
           </div>
         </aside>

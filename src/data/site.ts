@@ -5,6 +5,15 @@ export const site = {
   email: "info@promows.com",
   serviceArea: "North America",
   locale: "en_US",
+  // No public street address yet — ProMows dispatches from partner
+  // hubs across North America. Update once a headquarters is set.
+  address: {
+    line: "Service dispatch — mailing address coming soon",
+    locality: "North America",
+    region: "",
+    postalCode: "",
+    country: "US",
+  },
   partner: {
     name: "PlowWow",
     domain: "plowwow.com",

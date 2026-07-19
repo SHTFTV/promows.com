@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Leaf, Mail, Snowflake } from "lucide-react";
+import { Leaf, Mail, MapPin, Snowflake } from "lucide-react";
 import { services, site } from "@/data/site";
 
 export function Footer() {
@@ -17,10 +17,18 @@ export function Footer() {
           <p className="mt-3 text-sm opacity-80">
             {site.tagline}. Serving homeowners and property managers across {site.serviceArea}.
           </p>
-          <div className="mt-4 space-y-1 text-sm">
+          <div className="mt-4 space-y-2 text-sm not-italic" itemScope itemType="https://schema.org/PostalAddress">
             <a href={`mailto:${site.email}`} className="flex items-center gap-2 hover:underline">
               <Mail className="h-4 w-4" aria-hidden /> {site.email}
             </a>
+            <address className="flex items-start gap-2 not-italic opacity-80">
+              <MapPin className="h-4 w-4 mt-0.5 shrink-0" aria-hidden />
+              <span>
+                <span itemProp="addressLocality">{site.address.locality}</span>
+                <br />
+                <span className="opacity-80">{site.address.line}</span>
+              </span>
+            </address>
           </div>
         </div>
 
