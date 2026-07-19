@@ -70,6 +70,7 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
+  const [foundingOpen, setFoundingOpen] = useState(false);
   return (
     <>
       {/* HERO */}
@@ -164,12 +165,12 @@ function HomePage() {
               </p>
             </div>
           </div>
-          <Link
-            to="/contact"
+          <button
+            onClick={() => setFoundingOpen(true)}
             className="inline-flex items-center gap-2 rounded-lg bg-background px-6 py-3 font-bold text-primary shadow-lg transition-transform hover:-translate-y-0.5"
           >
             Join &amp; claim my block <ArrowRight className="h-4 w-4" />
-          </Link>
+          </button>
         </div>
       </section>
 
@@ -188,7 +189,7 @@ function HomePage() {
             </p>
           </div>
           <Link
-            to="/contact"
+            to="/pros"
             className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-primary px-6 py-3 font-bold text-primary-foreground shadow-lg transition-transform hover:-translate-y-0.5"
           >
             Apply to join ProMows <ArrowRight className="h-4 w-4" />
