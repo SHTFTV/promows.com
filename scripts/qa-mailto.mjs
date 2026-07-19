@@ -104,7 +104,6 @@ try {
 
 
 if (failures.length) {
-  await mkdir(REPORT_DIR, { recursive: true });
   await writeFile(
     join(REPORT_DIR, "summary.json"),
     JSON.stringify({ base: BASE, email: EMAIL, failures }, null, 2)
