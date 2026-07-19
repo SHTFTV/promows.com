@@ -19,6 +19,7 @@ async function buildEntries(): Promise<Entry[]> {
     { path: "/about", priority: "0.6", changefreq: "yearly", lastmod: today },
     { path: "/contact", priority: "0.7", changefreq: "yearly", lastmod: today },
     { path: "/partners", priority: "0.6", changefreq: "monthly", lastmod: today },
+    { path: "/pros", priority: "0.7", changefreq: "monthly", lastmod: today },
     { path: "/blog", priority: "0.8", changefreq: "weekly", lastmod: today },
   ];
 
