@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowRight, CalendarDays, CheckCircle2, Droplets, Leaf, Scissors, Sprout, TreePine } from "lucide-react";
-import { serviceBySlug, services, site, SITE_URL, LOGO_URL, OG_IMAGE_URL } from "@/data/site";
+import { serviceBySlug, services, site, SITE_URL, LOGO_URL, OG_IMAGE_URL } , seoLinks from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
 
 const iconMap = { Scissors, Sprout, TreePine, Leaf, Droplets, CalendarDays } as const;
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/services/$slug")({
         { name: "twitter:image", content: OG_IMAGE_URL },
         ...(s ? [] : [{ name: "robots", content: "noindex" }]),
       ],
-      links: [{ rel: "canonical", href: `/services/${params.slug}` }],
+      links: seoLinks(`/services/${params.slug}`),
       scripts: s
         ? [
             {

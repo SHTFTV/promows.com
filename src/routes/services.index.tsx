@@ -22,7 +22,7 @@ export const Route = createFileRoute("/services/")({
       { name: "twitter:description", content: "Mowing, design, trimming, cleanups, and fertilization." },
       { name: "twitter:image", content: OG_IMAGE_URL },
     ],
-    links: [{ rel: "canonical", href: "/services" }],
+    links: seoLinks("/services"),
 
     scripts: [
       {

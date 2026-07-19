@@ -20,7 +20,7 @@ export const Route = createFileRoute("/about")({
       { name: "twitter:description", content: "Same-crew consistency, flat pricing, year-round property care." },
       { name: "twitter:image", content: OG_IMAGE_URL },
     ],
-    links: [{ rel: "canonical", href: "/about" }],
+    links: seoLinks("/about"),
   }),
 
   component: About,

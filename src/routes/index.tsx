@@ -42,7 +42,7 @@ export const Route = createFileRoute("/")({
       { name: "twitter:description", content: "Sharp lawns, thoughtful landscapes, honest crews across North America." },
       { name: "twitter:image", content: OG_IMAGE_URL },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: seoLinks("/"),
     scripts: [
       {
         type: "application/ld+json",

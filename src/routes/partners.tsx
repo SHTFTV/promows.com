@@ -23,7 +23,7 @@ export const Route = createFileRoute("/partners")({
       { name: "twitter:description", content: "Lawn care by ProMows. Snow removal by PlowWow. One team, all year." },
       { name: "twitter:image", content: OG_IMAGE_URL },
     ],
-    links: [{ rel: "canonical", href: "/partners" }],
+    links: seoLinks("/partners"),
 
     scripts: [
       {
