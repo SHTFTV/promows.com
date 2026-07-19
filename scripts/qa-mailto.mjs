@@ -1,19 +1,17 @@
 #!/usr/bin/env node
 /**
  * Responsive QA check: verifies the info@promows.com mailto link is
- * visible (not hidden by CSS or conditional layout) in the header,
- * footer, and contact page across mobile / tablet / desktop breakpoints.
+ * visible in header/footer/contact across mobile/tablet/desktop.
  *
- * On failure, writes per-route artifacts to qa-reports/mailto/:
- *   - <bp>__<route>__<region>.png   full-page screenshot
- *   - <bp>__<route>__<region>.html  serialized DOM snapshot
- *   - summary.json                  machine-readable failure list
+ * Emits qa-reports/mailto/results.ndjson (one JSON per check) with
+ * base URL, HTTP status, route, region, breakpoint, and pass/fail.
+ * On failure also writes .png + .html snapshots and summary.json.
  *
  * Usage:
  *   BASE_URL=http://localhost:8080 node scripts/qa-mailto.mjs
  */
 import { chromium } from "playwright";
-import { mkdir, writeFile, rm } from "node:fs/promises";
+import { mkdir, writeFile, appendFile, rm } from "node:fs/promises";
 import { join } from "node:path";
 
 const BASE = process.env.BASE_URL || "http://localhost:8080";
