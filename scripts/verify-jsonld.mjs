@@ -4,30 +4,65 @@
  * running server and validates the emitted JSON-LD in the RAW SSR HTML
  * (no client JS execution).
  *
- * For each URL we assert:
+ * Assertions per URL:
  *   - HTTP 200
- *   - Organization or LocalBusiness JSON-LD with well-formed PostalAddress
- *     (streetAddress, addressLocality, addressRegion) and a ContactPoint /
- *     top-level email of info@promows.com
+ *   - Organization/LocalBusiness w/ well-formed PostalAddress + ContactPoint
+ *     email = info@promows.com
  *   - City routes: BreadcrumbList AND FAQPage present in raw HTML
  *   - Blog routes: BreadcrumbList present in raw HTML
- *   - If AggregateRating is present, ratingValue + reviewCount are numeric
+ *   - If AggregateRating present → ratingValue/reviewCount numeric
+ *   - If WebPage present → has name + url
+ *   - If ItemList present → itemListElement is a non-empty array w/ positions
  *
- * Outputs per-route JSON to qa-reports/jsonld/<slug>.json and a combined
- * qa-reports/jsonld/results.ndjson (one JSON object per line, machine-
- * readable) plus qa-reports/jsonld/summary.json.
+ * Outputs:
+ *   qa-reports/jsonld/results.ndjson    one JSON per route
+ *   qa-reports/jsonld/<slug>.json       per-route detail
+ *   qa-reports/jsonld/<slug>.html       raw HTML snippet on failure
+ *   qa-reports/jsonld/snapshots/<slug>.json  extracted JSON-LD blocks (all runs)
+ *   qa-reports/jsonld/diff.json + diff.txt  vs previous snapshot dir
+ *   qa-reports/jsonld/summary.json      combined summary
+ *
+ * Filtering (allow/deny — patterns are substrings OR /regex/):
+ *   QA_ONLY="/city/austin,/blog/spring"   only these routes
+ *   QA_SKIP="/city/beta-,/blog/draft-"    skip these
+ *   QA_ONLY="/regex:^/city/"              regex form
+ *   --only=<pat> / --skip=<pat>           CLI overrides
  *
  * Usage:
  *   BASE_URL=http://localhost:8080 node scripts/verify-jsonld.mjs
  */
 import { XMLParser } from "fast-xml-parser";
-import { mkdir, writeFile, appendFile, rm } from "node:fs/promises";
+import { mkdir, writeFile, appendFile, rm, readFile, cp, readdir } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 const BASE = process.env.BASE_URL || "http://localhost:8080";
 const EMAIL = "info@promows.com";
 const REPORT_DIR = "qa-reports/jsonld";
+const SNAPSHOT_DIR = join(REPORT_DIR, "snapshots");
+const PREV_SNAPSHOT_DIR = "qa-reports/jsonld-prev/snapshots";
 const NDJSON = join(REPORT_DIR, "results.ndjson");
+
+// --- filter parsing ------------------------------------------------------
+function parseArg(name) {
+  const hit = process.argv.find((a) => a.startsWith(`--${name}=`));
+  return hit ? hit.slice(name.length + 3) : "";
+}
+function toMatchers(raw) {
+  if (!raw) return [];
+  return raw.split(",").map((s) => s.trim()).filter(Boolean).map((s) => {
+    if (s.startsWith("/regex:")) return new RegExp(s.slice(7));
+    if (s.startsWith("/") && s.endsWith("/") && s.length > 2) return new RegExp(s.slice(1, -1));
+    return s;
+  });
+}
+const ONLY = toMatchers(parseArg("only") || process.env.QA_ONLY || "");
+const SKIP = toMatchers(parseArg("skip") || process.env.QA_SKIP || "");
+const matches = (path, m) => (m instanceof RegExp ? m.test(path) : path.includes(m));
+const passesFilter = (path) =>
+  (!ONLY.length || ONLY.some((m) => matches(path, m))) &&
+  !SKIP.some((m) => matches(path, m));
+
 
 async function loadUrlsFromSitemap() {
   const res = await fetch(`${BASE}/sitemap.xml`);
@@ -154,24 +189,74 @@ function assertRoute(path, html) {
            nodes.some((n) => n.aggregateRating))
     record("aggregate_rating", true, "well-formed");
 
+  // WebPage (when present): must have name + url
+  if (hasType(nodes, "WebPage")) {
+    const wp = nodes.find((n) => typesOf(n).includes("WebPage"));
+    const missing = ["name", "url"].filter((k) => !wp?.[k] || String(wp[k]).trim() === "");
+    record("webpage", missing.length === 0,
+      missing.length ? `WebPage missing: ${missing.join(", ")}` : `url=${wp.url}`);
+  }
+
+  // ItemList (when present): non-empty itemListElement w/ positions
+  if (hasType(nodes, "ItemList")) {
+    const il = nodes.find((n) => typesOf(n).includes("ItemList"));
+    const items = Array.isArray(il?.itemListElement) ? il.itemListElement : [];
+    if (!items.length) {
+      record("item_list", false, "ItemList.itemListElement empty");
+    } else {
+      const bad = items.filter((it, i) => {
+        const pos = Number(it?.position);
+        return !Number.isFinite(pos) || pos !== i + 1 || !(it?.url || it?.item);
+      });
+      record("item_list", bad.length === 0,
+        bad.length ? `${bad.length} ItemList entries missing position/url` : `${items.length} items`);
+    }
+  }
+
   const entityTypes = [...new Set(nodes.flatMap(typesOf).filter(Boolean))];
+  const rawBlocks = collectRawBlocks(html);
   const ok = assertions.every((a) => a.ok);
-  return { ok, entityTypes, assertions, routeKind: isCity ? "city" : isBlog ? "blog" : "other" };
+  return { ok, entityTypes, assertions, rawBlocks,
+    routeKind: isCity ? "city" : isBlog ? "blog" : "other" };
 }
+
+// Return the exact raw JSON-LD block strings, sorted for stable diffs.
+function collectRawBlocks(html) {
+  const blocks = [];
+  const re = new RegExp(JSONLD_RE.source, "gi");
+  let m;
+  while ((m = re.exec(html))) blocks.push(m[1].trim());
+  return blocks.sort();
+}
+
 
 const slugify = (p) =>
   p.replace(/[^a-z0-9]+/gi, "_").replace(/^_|_$/g, "") || "root";
 
+// Preserve previous run's snapshots for diffing before wiping.
+await rm(PREV_SNAPSHOT_DIR, { recursive: true, force: true });
+if (existsSync(SNAPSHOT_DIR)) {
+  await mkdir("qa-reports/jsonld-prev", { recursive: true });
+  await cp(SNAPSHOT_DIR, PREV_SNAPSHOT_DIR, { recursive: true });
+}
 await rm(REPORT_DIR, { recursive: true, force: true });
-await mkdir(REPORT_DIR, { recursive: true });
+await mkdir(SNAPSHOT_DIR, { recursive: true });
 
-const urls = await loadUrlsFromSitemap();
-if (!urls.length) {
+const allUrls = await loadUrlsFromSitemap();
+if (!allUrls.length) {
   console.error("No /city or /blog URLs found in sitemap.xml — nothing to check.");
   process.exit(1);
 }
+const urls = allUrls.filter(passesFilter);
+const skipped = allUrls.length - urls.length;
+if (!urls.length) {
+  console.error(`Filters excluded all ${allUrls.length} URLs. Adjust --only/--skip / QA_ONLY / QA_SKIP.`);
+  process.exit(1);
+}
 
-console.log(`Checking ${urls.length} URL(s) at ${BASE}\n`);
+console.log(`Checking ${urls.length} URL(s) at ${BASE}` +
+  (skipped ? ` (${skipped} filtered out)` : "") + "\n");
+
 const failures = [];
 const allResults = [];
 for (const path of urls) {
@@ -189,13 +274,15 @@ for (const path of urls) {
   const result =
     status === 200
       ? assertRoute(path, html)
-      : { ok: false, entityTypes: [], assertions: [{ name: "http", ok: false, detail: `HTTP ${status}` }], routeKind: path.startsWith("/city/") ? "city" : "blog" };
+      : { ok: false, entityTypes: [], assertions: [{ name: "http", ok: false, detail: `HTTP ${status}` }],
+          rawBlocks: [], routeKind: path.startsWith("/city/") ? "city" : "blog" };
+
+  const slug = slugify(path);
+  await writeFile(join(SNAPSHOT_DIR, `${slug}.json`),
+    JSON.stringify({ path, url, blocks: result.rawBlocks ?? [] }, null, 2));
 
   const record = {
-    base: BASE,
-    url,
-    path,
-    status,
+    base: BASE, url, path, status,
     routeKind: result.routeKind,
     entityTypes: result.entityTypes,
     ok: result.ok,
@@ -204,15 +291,60 @@ for (const path of urls) {
   };
   allResults.push(record);
   await appendFile(NDJSON, JSON.stringify(record) + "\n");
-  await writeFile(join(REPORT_DIR, `${slugify(path)}.json`), JSON.stringify(record, null, 2));
+  await writeFile(join(REPORT_DIR, `${slug}.json`), JSON.stringify(record, null, 2));
 
   if (result.ok) {
     console.log(`PASS ${path}  [${status}] types=${result.entityTypes.join(",")}`);
   } else {
     const reasons = record.failedAssertions.map((a) => `${a.name}: ${a.detail}`).join(" | ");
     console.log(`FAIL ${path}  [${status}] ${reasons}`);
-    await writeFile(join(REPORT_DIR, `${slugify(path)}.html`), html.slice(0, 20000));
+    await writeFile(join(REPORT_DIR, `${slug}.html`), html.slice(0, 20000));
     failures.push(record);
+  }
+}
+
+// --- diff snapshots vs previous run --------------------------------------
+async function diffSnapshots() {
+  if (!existsSync(PREV_SNAPSHOT_DIR)) return null;
+  const [prevFiles, currFiles] = await Promise.all([
+    readdir(PREV_SNAPSHOT_DIR), readdir(SNAPSHOT_DIR),
+  ]);
+  const load = async (dir, f) => JSON.parse(await readFile(join(dir, f), "utf8"));
+  const prevMap = new Map();
+  for (const f of prevFiles) { const j = await load(PREV_SNAPSHOT_DIR, f); prevMap.set(j.path, j); }
+  const currMap = new Map();
+  for (const f of currFiles) { const j = await load(SNAPSHOT_DIR, f); currMap.set(j.path, j); }
+
+  const added = [], removed = [], changed = [];
+  for (const [p, c] of currMap) {
+    const prev = prevMap.get(p);
+    if (!prev) { added.push(p); continue; }
+    if (JSON.stringify(prev.blocks) !== JSON.stringify(c.blocks)) {
+      const gone = prev.blocks.filter((x) => !c.blocks.includes(x));
+      const fresh = c.blocks.filter((x) => !prev.blocks.includes(x));
+      changed.push({ path: p, removedBlocks: gone.length, addedBlocks: fresh.length,
+        sample: { removed: gone[0]?.slice(0, 400), added: fresh[0]?.slice(0, 400) } });
+    }
+  }
+  for (const p of prevMap.keys()) if (!currMap.has(p)) removed.push(p);
+  return { added, removed, changed };
+}
+const diff = await diffSnapshots();
+if (diff) {
+  await writeFile(join(REPORT_DIR, "diff.json"), JSON.stringify(diff, null, 2));
+  const lines = [
+    `JSON-LD diff vs previous run (base=${BASE})`,
+    `  routes added:   ${diff.added.length}`,
+    `  routes removed: ${diff.removed.length}`,
+    `  routes changed: ${diff.changed.length}`,
+    "",
+    ...diff.changed.map((c) => `~ ${c.path}  (+${c.addedBlocks} / -${c.removedBlocks} JSON-LD block(s))`),
+    ...diff.added.map((p) => `+ ${p}`),
+    ...diff.removed.map((p) => `- ${p}`),
+  ];
+  await writeFile(join(REPORT_DIR, "diff.txt"), lines.join("\n"));
+  if (diff.added.length || diff.removed.length || diff.changed.length) {
+    console.log(`\nDiff vs previous run: +${diff.added.length} -${diff.removed.length} ~${diff.changed.length}  (see diff.txt)`);
   }
 }
 
