@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { services, site, SITE_URL, LOGO_URL, OG_IMAGE_URL, seoLinks } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
-import heroSquare from "@/assets/promows-hero-square.png.asset.json";
+import heroSquare from "@/assets/promows-hero-square-clean.png";
 
 
 const iconMap = {
