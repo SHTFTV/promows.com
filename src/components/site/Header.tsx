@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { Leaf, Menu, Phone, Snowflake, X } from "lucide-react";
+import { Menu, Phone, Snowflake, X } from "lucide-react";
 import { useState } from "react";
 import { site } from "@/data/site";
+import logoAsset from "@/assets/promows-logo.png.asset.json";
+
 
 const nav = [
   { to: "/", label: "Home" },
@@ -39,13 +41,19 @@ export function Header() {
 
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
         <Link to="/" className="flex items-center gap-2 font-heading text-xl font-extrabold tracking-tight">
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Leaf className="h-5 w-5" aria-hidden />
-          </span>
-          <span>
+          <img
+            src={logoAsset.url}
+            alt="ProMows Lawn Care logo"
+            width={40}
+            height={40}
+            className="h-10 w-10 rounded-md object-contain"
+          />
+          <span className="sr-only">ProMows</span>
+          <span aria-hidden>
             Pro<span className="text-primary">Mows</span>
           </span>
         </Link>
+
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
           {nav.map((n) => (
