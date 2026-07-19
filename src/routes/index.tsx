@@ -63,6 +63,20 @@ export const Route = createFileRoute("/")({
           priceRange: "$$",
         }),
       },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            { "@type": "Question", name: "How does founding pricing work?", acceptedAnswer: { "@type": "Answer", text: "Founding pricing starts at $10/month per household, exclusive to one home per block. Your rate is locked for as long as you stay on service." } },
+            { "@type": "Question", name: "What areas are opening first?", acceptedAnswer: { "@type": "Answer", text: "We open neighborhoods by demand — high-signup ZIP codes in Colorado, Texas, and the Midwest are first in line for spring routes." } },
+            { "@type": "Question", name: "How do you select the pros who service my street?", acceptedAnswer: { "@type": "Answer", text: "Every applicant is vetted for insurance, equipment, past work photos, and references. Homeowners rate every job and low-rated pros lose the route." } },
+            { "@type": "Question", name: "Is there a contract or auto-renew?", acceptedAnswer: { "@type": "Answer", text: "No contract and no auto-enroll. Pause or cancel anytime; founding pricing resumes when you come back." } },
+            { "@type": "Question", name: "What if my block already has a founding member?", acceptedAnswer: { "@type": "Answer", text: "You'll join the waitlist for that block and get standard ProMows pricing when service starts in your area." } },
+          ],
+        }),
+      },
     ],
   }),
 
