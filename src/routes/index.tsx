@@ -112,7 +112,7 @@ function HomePage() {
           <div className="relative">
             <div className="overflow-hidden rounded-[2.5rem] ring-1 ring-primary/20 shadow-2xl">
               <img
-                src={heroSquare.url}
+                src={heroSquare}
                 alt="ProMows Lawn Care truck and trailer parked at a beautifully landscaped property"
                 className="h-full w-full object-cover"
                 width={1024}
