@@ -24,7 +24,27 @@ const BREAKPOINTS = [
   { name: "tablet", width: 768, height: 1024 },
   { name: "desktop", width: 1440, height: 900 },
 ];
-const ROUTES = ["/", "/contact", "/blog", "/services", "/partners"];
+const ALL_ROUTES = ["/", "/contact", "/blog", "/services", "/partners"];
+
+function parseArg(name) {
+  const hit = process.argv.find((a) => a.startsWith(`--${name}=`));
+  return hit ? hit.slice(name.length + 3) : "";
+}
+function toMatchers(raw) {
+  if (!raw) return [];
+  return raw.split(",").map((s) => s.trim()).filter(Boolean).map((s) => {
+    if (s.startsWith("/regex:")) return new RegExp(s.slice(7));
+    if (s.startsWith("/") && s.endsWith("/") && s.length > 2) return new RegExp(s.slice(1, -1));
+    return s;
+  });
+}
+const ONLY = toMatchers(parseArg("only") || process.env.QA_ONLY || "");
+const SKIP = toMatchers(parseArg("skip") || process.env.QA_SKIP || "");
+const matches = (r, m) => (m instanceof RegExp ? m.test(r) : r.includes(m));
+const ROUTES = ALL_ROUTES.filter(
+  (r) => (!ONLY.length || ONLY.some((m) => matches(r, m))) && !SKIP.some((m) => matches(r, m))
+);
+if (!ROUTES.length) { console.error("Filters excluded all routes."); process.exit(1); }
 
 async function checkRegion(page, region) {
   return await page.evaluate(
