@@ -40,17 +40,16 @@ type ApprovedPhoto = { id: string; url: string; caption: string | null; uploader
 function ProsPage() {
   return (
     <>
-      <section className="border-b border-border bg-foreground text-background">
+      <section className="border-b border-border bg-muted">
         <div className="mx-auto max-w-5xl px-4 py-16 md:py-20">
-          <span className="inline-flex items-center rounded-full bg-primary/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary ring-1 ring-primary/40">
+          <span className="inline-flex items-center rounded-full bg-primary/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary ring-1 ring-primary/30">
             Now hiring
           </span>
-          <h1 className="mt-4 font-heading text-4xl font-extrabold md:text-5xl">
-            Top-quality lawn care professionals — apply today
+          <h1 className="mt-4 font-heading text-4xl font-extrabold text-foreground md:text-5xl">
+            We're looking for top-quality lawn care professionals
           </h1>
-          <p className="mt-4 max-w-2xl text-lg opacity-80">
-            Solo operators, established crews, and landscape pros welcome. Bring your standards; we bring the routes,
-            the software, and steady weekly work.
+          <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
+            Exclusive Territories — Reliable crews, solo operators, and landscape pros — bring your standards, we'll bring the routes and steady work.
           </p>
         </div>
       </section>
