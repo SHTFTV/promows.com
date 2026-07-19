@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, HeartHandshake, Repeat, Shield, Snowflake, Users } from "lucide-react";
-import { site, SITE_URL, OG_IMAGE_URL } from "@/data/site";
+import { site, SITE_URL, OG_IMAGE_URL, seoLinks } from "@/data/site";
 import heroVideo from "@/assets/promows-hero.mp4.asset.json";
 import truckAsset from "@/assets/promows-truck.png.asset.json";
 

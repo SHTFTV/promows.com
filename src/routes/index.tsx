@@ -10,7 +10,7 @@ import {
   Star,
   TreePine,
 } from "lucide-react";
-import { services, site, SITE_URL, LOGO_URL, OG_IMAGE_URL } from "@/data/site";
+import { services, site, SITE_URL, LOGO_URL, OG_IMAGE_URL, seoLinks } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
 import truckAsset from "@/assets/promows-truck.png.asset.json";
 

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Award, HeartHandshake, Leaf, ShieldCheck, Users } from "lucide-react";
-import { site, SITE_URL, OG_IMAGE_URL } from "@/data/site";
+import { site, SITE_URL, OG_IMAGE_URL, seoLinks } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
 
 export const Route = createFileRoute("/about")({

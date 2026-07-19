@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowRight, CalendarDays, CheckCircle2, Droplets, Leaf, Scissors, Sprout, TreePine } from "lucide-react";
-import { serviceBySlug, services, site, SITE_URL, LOGO_URL, OG_IMAGE_URL } , seoLinks from "@/data/site";
+import { serviceBySlug, services, site, SITE_URL, LOGO_URL, OG_IMAGE_URL, seoLinks } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
 
 const iconMap = { Scissors, Sprout, TreePine, Leaf, Droplets, CalendarDays } as const;
