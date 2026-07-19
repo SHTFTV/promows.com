@@ -130,7 +130,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           logo: LOGO_URL,
           image: OG_IMAGE_URL,
           email: site.email,
-          telephone: site.phone,
           description:
             "Professional lawn and landscape care — mowing, landscape design, hedge and tree trimming, yard cleanups, and fertilization across North America.",
           areaServed: site.serviceArea,

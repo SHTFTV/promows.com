@@ -57,7 +57,6 @@ export const Route = createFileRoute("/")({
           url: SITE_URL,
           logo: LOGO_URL,
           image: OG_IMAGE_URL,
-          telephone: site.phone,
           email: site.email,
           areaServed: site.serviceArea,
           priceRange: "$$",
