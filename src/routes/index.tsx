@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   ArrowRight,
   CalendarDays,
@@ -12,6 +13,7 @@ import {
 } from "lucide-react";
 import { services, site, SITE_URL, LOGO_URL, OG_IMAGE_URL, seoLinks } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
+import { FoundingModal } from "@/components/site/FoundingModal";
 import heroSquare from "@/assets/promows-hero-square-clean.png";
 import logoHex from "@/assets/promows-logo-hex-transparent.png";
 
@@ -61,6 +63,20 @@ export const Route = createFileRoute("/")({
           priceRange: "$$",
         }),
       },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            { "@type": "Question", name: "How does founding pricing work?", acceptedAnswer: { "@type": "Answer", text: "Founding pricing starts at $10/month per household, exclusive to one home per block. Your rate is locked for as long as you stay on service." } },
+            { "@type": "Question", name: "What areas are opening first?", acceptedAnswer: { "@type": "Answer", text: "We open neighborhoods by demand — high-signup ZIP codes in Colorado, Texas, and the Midwest are first in line for spring routes." } },
+            { "@type": "Question", name: "How do you select the pros who service my street?", acceptedAnswer: { "@type": "Answer", text: "Every applicant is vetted for insurance, equipment, past work photos, and references. Homeowners rate every job and low-rated pros lose the route." } },
+            { "@type": "Question", name: "Is there a contract or auto-renew?", acceptedAnswer: { "@type": "Answer", text: "No contract and no auto-enroll. Pause or cancel anytime; founding pricing resumes when you come back." } },
+            { "@type": "Question", name: "What if my block already has a founding member?", acceptedAnswer: { "@type": "Answer", text: "You'll join the waitlist for that block and get standard ProMows pricing when service starts in your area." } },
+          ],
+        }),
+      },
     ],
   }),
 
@@ -68,6 +84,7 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
+  const [foundingOpen, setFoundingOpen] = useState(false);
   return (
     <>
       {/* HERO */}
@@ -156,18 +173,18 @@ function HomePage() {
               </h2>
               <p className="mt-1 text-sm opacity-90 md:text-base">
                 Exclusive — one household per block locks in founding pricing before we open your area.{" "}
-                <Link to="/contact" className="underline decoration-2 underline-offset-2 hover:opacity-100">
+                <a href="#founding-faq" className="underline decoration-2 underline-offset-2 hover:opacity-100">
                   Learn more
-                </Link>
+                </a>
               </p>
             </div>
           </div>
-          <Link
-            to="/contact"
+          <button
+            onClick={() => setFoundingOpen(true)}
             className="inline-flex items-center gap-2 rounded-lg bg-background px-6 py-3 font-bold text-primary shadow-lg transition-transform hover:-translate-y-0.5"
           >
             Join &amp; claim my block <ArrowRight className="h-4 w-4" />
-          </Link>
+          </button>
         </div>
       </section>
 
@@ -186,7 +203,7 @@ function HomePage() {
             </p>
           </div>
           <Link
-            to="/contact"
+            to="/pros"
             className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-primary px-6 py-3 font-bold text-primary-foreground shadow-lg transition-transform hover:-translate-y-0.5"
           >
             Apply to join ProMows <ArrowRight className="h-4 w-4" />
@@ -276,6 +293,46 @@ function HomePage() {
 
       <PartnerCallout />
 
+      {/* FAQ */}
+      <section id="founding-faq" className="mx-auto max-w-4xl px-4 py-20" aria-labelledby="faq-title">
+        <h2 id="faq-title" className="font-heading text-3xl font-extrabold md:text-4xl">
+          Frequently asked questions
+        </h2>
+        <p className="mt-2 text-muted-foreground">Founding pricing, service areas, and how we pick pros.</p>
+        <div className="mt-8 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
+          {[
+            {
+              q: "How does founding pricing work?",
+              a: "Founding pricing starts at $10/month per household and is exclusive to one home per block. Once your neighborhood opens, we lock your rate in for as long as you stay on service — future price changes never touch founding members.",
+            },
+            {
+              q: "What areas are opening first?",
+              a: "We're opening neighborhoods by demand. High-signup ZIP codes in Colorado, Texas, and the Midwest are first in line for spring routes; every other market rolls out as we hit crew capacity. Drop your address to move your block up the list.",
+            },
+            {
+              q: "How do you select the pros who service my street?",
+              a: "Every applicant is vetted for insurance, equipment quality, past work photos, and neighborhood references. We ride along on the first two visits, and homeowners rate every job. Pros who drop below 4.7★ or miss schedules lose the route.",
+            },
+            {
+              q: "Is there a contract or auto-renew?",
+              a: "No contract, no auto-enroll. You can pause or cancel any time. Founding pricing simply resumes when you come back the following season.",
+            },
+            {
+              q: "What if my block already has a founding member?",
+              a: "We'll add you to the waitlist for that block and notify you the moment a spot opens. In the meantime, you'll still get standard ProMows pricing when service starts in your area.",
+            },
+          ].map((f) => (
+            <details key={f.q} className="group">
+              <summary className="flex cursor-pointer items-center justify-between gap-4 px-6 py-5 font-semibold text-foreground marker:hidden hover:bg-accent/30">
+                {f.q}
+                <span className="text-primary transition-transform group-open:rotate-45 text-2xl leading-none">+</span>
+              </summary>
+              <div className="px-6 pb-5 text-muted-foreground">{f.a}</div>
+            </details>
+          ))}
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="mx-auto max-w-7xl px-4 py-20">
         <div className="rounded-3xl bg-primary p-10 text-primary-foreground md:p-14">
@@ -298,6 +355,8 @@ function HomePage() {
           </div>
         </div>
       </section>
+
+      <FoundingModal open={foundingOpen} onClose={() => setFoundingOpen(false)} />
     </>
   );
 }
