@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, HeartHandshake, Repeat, Shield, Snowflake, Users } from "lucide-react";
-import { site, SITE_URL, OG_IMAGE_URL } from "@/data/site";
+import { site, SITE_URL, OG_IMAGE_URL, seoLinks } from "@/data/site";
 import heroVideo from "@/assets/promows-hero.mp4.asset.json";
 import truckAsset from "@/assets/promows-truck.png.asset.json";
 
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/partners")({
       { name: "twitter:description", content: "Lawn care by ProMows. Snow removal by PlowWow. One team, all year." },
       { name: "twitter:image", content: OG_IMAGE_URL },
     ],
-    links: [{ rel: "canonical", href: "/partners" }],
+    links: seoLinks("/partners"),
 
     scripts: [
       {

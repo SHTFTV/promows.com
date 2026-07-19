@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Mail, MapPin, Phone } from "lucide-react";
-import { site, SITE_URL, OG_IMAGE_URL } from "@/data/site";
+import { site, SITE_URL, OG_IMAGE_URL, seoLinks } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
 
 export const Route = createFileRoute("/contact")({
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/contact")({
       { name: "twitter:description", content: "Free lawn & landscape quotes. Response within 24 hours." },
       { name: "twitter:image", content: OG_IMAGE_URL },
     ],
-    links: [{ rel: "canonical", href: "/contact" }],
+    links: seoLinks("/contact"),
   }),
 
   component: Contact,
