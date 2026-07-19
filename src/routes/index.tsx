@@ -174,7 +174,7 @@ function HomePage() {
               <p className="mt-1 text-sm opacity-90 md:text-base">
                 Exclusive — one household per block locks in founding pricing before we open your area.{" "}
                 <a href="#founding-faq" className="underline decoration-2 underline-offset-2 hover:opacity-100">
-                  Learn more
+                  Exclusive Territories
                 </a>
               </p>
             </div>
