@@ -111,7 +111,19 @@ function HomePage() {
           </div>
 
           <div className="relative flex items-center justify-center">
-            <div className="absolute inset-6 rounded-[3rem] bg-gradient-to-br from-primary/30 via-primary/10 to-transparent blur-2xl" aria-hidden />
+            <div className="absolute inset-2 overflow-hidden rounded-[2.5rem] ring-1 ring-primary/20 shadow-2xl" aria-hidden>
+              <img
+                src={heroCrewBg}
+                alt=""
+                className="h-full w-full object-cover"
+                width={1920}
+                height={1280}
+                loading="eager"
+              />
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/50 via-primary/10 to-transparent mix-blend-multiply" />
+              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/70 to-transparent" />
+            </div>
+            <div className="pointer-events-none absolute inset-6 rounded-[3rem] bg-gradient-to-br from-primary/30 via-primary/10 to-transparent blur-2xl" aria-hidden />
             <img
               src={truckAsset.url}
               alt="ProMows lawn care truck with green grass wrap"
@@ -121,7 +133,17 @@ function HomePage() {
               loading="eager"
               fetchPriority="high"
             />
-            <div className="absolute bottom-2 left-2 grid grid-cols-2 gap-3 text-sm md:left-6">
+            <div className="absolute bottom-4 left-4 grid grid-cols-2 gap-3 text-sm md:left-8">
+              <div className="rounded-xl bg-background/90 p-3 shadow-lg backdrop-blur">
+                <div className="text-2xl font-extrabold text-primary">4.9★</div>
+                <div className="text-xs text-muted-foreground">Avg. rating</div>
+              </div>
+              <div className="rounded-xl bg-background/90 p-3 shadow-lg backdrop-blur">
+                <div className="text-2xl font-extrabold text-primary">98%</div>
+                <div className="text-xs text-muted-foreground">On-time visits</div>
+              </div>
+            </div>
+          </div>
               <div className="rounded-xl bg-background/90 p-3 shadow-lg backdrop-blur">
                 <div className="text-2xl font-extrabold text-primary">4.9★</div>
                 <div className="text-xs text-muted-foreground">Avg. rating</div>
