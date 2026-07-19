@@ -13,6 +13,7 @@ import {
 import { services, site, SITE_URL, LOGO_URL, OG_IMAGE_URL, seoLinks } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
 import truckAsset from "@/assets/promows-truck.png.asset.json";
+import heroCrewBg from "@/assets/hero-crew-bg.jpg";
 
 
 const iconMap = {
