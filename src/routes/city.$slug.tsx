@@ -115,9 +115,9 @@ export const Route = createFileRoute("/city/$slug")({
 
 function CityPage() {
   const { city } = Route.useLoaderData();
-  const offered = city.services as string[]
-    .map((slug: string) => serviceBySlug(slug))
-    .filter((s: ReturnType<typeof serviceBySlug>): s is NonNullable<ReturnType<typeof serviceBySlug>> => Boolean(s));
+  const offered = (city.services as string[])
+    .map((slug) => serviceBySlug(slug))
+    .filter((s): s is NonNullable<ReturnType<typeof serviceBySlug>> => Boolean(s));
   const otherCities = cities.filter((c) => c.slug !== city.slug);
 
   return (
