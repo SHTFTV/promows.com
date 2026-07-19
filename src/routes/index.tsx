@@ -126,7 +126,7 @@ function HomePage() {
             <img
               src={truckAsset.url}
               alt="ProMows lawn care truck with green grass wrap"
-              className="absolute bottom-4 right-4 w-1/2 max-w-xs drop-shadow-2xl md:w-2/5"
+              className="absolute -bottom-6 -right-6 w-[110%] max-w-none drop-shadow-2xl md:w-[120%]"
               width={1024}
               height={1024}
               loading="eager"
