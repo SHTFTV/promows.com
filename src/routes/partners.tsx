@@ -63,11 +63,12 @@ function Partners() {
           <h1 className="mt-4 font-heading text-4xl font-extrabold md:text-5xl">
             ProMows &amp; PlowWow — one team, all four seasons.
           </h1>
-          <p className="mt-4 text-lg text-muted-foreground">
+          <p className="mt-4 text-lg text-background/80">
             Your property has two jobs: keep it green in the growing months and keep it safe when
             the snow flies. ProMows handles the first. PlowWow handles the second. Same standards.
             Same insurance requirements. One less company to vet.
           </p>
+
           <div className="mt-6 flex flex-wrap gap-3">
             <a
               href={site.partner.url}
