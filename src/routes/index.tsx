@@ -13,7 +13,7 @@ import {
 import { services, site, SITE_URL, LOGO_URL, OG_IMAGE_URL, seoLinks } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
 import heroSquare from "@/assets/promows-hero-square-clean.png";
-import logoHex from "@/assets/promows-logo-hex.png.asset.json";
+import logoHex from "@/assets/promows-logo-hex-transparent.png";
 
 
 const iconMap = {
@@ -133,7 +133,7 @@ function HomePage() {
               </div>
             </div>
             <img
-              src={logoHex.url}
+              src={logoHex}
               alt="ProMows Lawn Care logo"
               className="absolute bottom-4 right-4 w-32 sm:w-40 md:w-48 lg:w-56 drop-shadow-2xl"
               loading="eager"
