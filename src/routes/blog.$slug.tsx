@@ -1,14 +1,15 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { CalendarDays, Clock } from "lucide-react";
-import { postBySlug, posts } from "@/data/blog";
+import { getPublishedPost } from "@/lib/content.functions";
 import { SITE_URL, LOGO_URL, OG_IMAGE_URL, seoLinks, site } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
+import type { BlogPost } from "@/data/blog";
 
 export const Route = createFileRoute("/blog/$slug")({
-  loader: ({ params }) => {
-    const post = postBySlug(params.slug);
+  loader: async ({ params }) => {
+    const { post, related } = await getPublishedPost({ data: { slug: params.slug } });
     if (!post) throw notFound();
-    return { post };
+    return { post, related };
   },
   head: ({ params, loaderData }) => {
     const p = loaderData?.post;
@@ -39,7 +40,7 @@ export const Route = createFileRoute("/blog/$slug")({
         { property: "article:published_time", content: p.publishedAt },
         { property: "article:modified_time", content: p.updatedAt },
         { property: "article:author", content: p.author },
-        ...p.tags.map((t) => ({ property: "article:tag", content: t })),
+        ...p.tags.map((t: string) => ({ property: "article:tag", content: t })),
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: p.title },
         { name: "twitter:description", content: p.excerpt },
@@ -83,6 +84,7 @@ export const Route = createFileRoute("/blog/$slug")({
       ],
     };
   },
+  errorComponent: ({ error }) => <div className="p-8" role="alert">{error.message}</div>,
   notFoundComponent: () => (
     <div className="mx-auto max-w-3xl px-4 py-24 text-center">
       <h1 className="font-heading text-4xl font-extrabold">Post not found</h1>
@@ -95,8 +97,7 @@ export const Route = createFileRoute("/blog/$slug")({
 });
 
 function BlogPostPage() {
-  const { post } = Route.useLoaderData();
-  const others = posts.filter((p) => p.slug !== post.slug).slice(0, 2);
+  const { post, related } = Route.useLoaderData() as { post: BlogPost; related: BlogPost[] };
 
   return (
     <>
@@ -112,9 +113,7 @@ function BlogPostPage() {
             </nav>
             <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-primary">
               {post.tags.map((t: string) => (
-                <span key={t} className="rounded-full bg-primary/10 px-2 py-0.5">
-                  {t}
-                </span>
+                <span key={t} className="rounded-full bg-primary/10 px-2 py-0.5">{t}</span>
               ))}
             </div>
             <h1 className="mt-3 font-heading text-4xl font-extrabold md:text-5xl">{post.title}</h1>
@@ -125,9 +124,7 @@ function BlogPostPage() {
                 <CalendarDays className="h-4 w-4" />
                 <time dateTime={post.publishedAt}>
                   {new Date(post.publishedAt).toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
+                    month: "long", day: "numeric", year: "numeric",
                   })}
                 </time>
               </span>
@@ -141,9 +138,7 @@ function BlogPostPage() {
         <div className="mx-auto max-w-3xl px-4 py-14">
           <div className="prose prose-lg max-w-none">
             {post.body.map((para: string, i: number) => (
-              <p key={i} className="mb-5 text-lg leading-relaxed text-foreground">
-                {para}
-              </p>
+              <p key={i} className="mb-5 text-lg leading-relaxed text-foreground">{para}</p>
             ))}
           </div>
         </div>
@@ -151,19 +146,24 @@ function BlogPostPage() {
 
       <PartnerCallout />
 
-      {others.length > 0 && (
+      {related.length > 0 && (
         <section className="mx-auto max-w-5xl px-4 py-16">
-          <h2 className="font-heading text-2xl font-extrabold">Keep reading</h2>
-          <div className="mt-6 grid gap-5 md:grid-cols-2">
-            {others.map((p) => (
+          <h2 className="font-heading text-2xl font-extrabold">Related reading</h2>
+          <div className="mt-6 grid gap-5 md:grid-cols-3">
+            {related.map((p) => (
               <Link
                 key={p.slug}
                 to="/blog/$slug"
                 params={{ slug: p.slug }}
                 className="rounded-2xl border border-border bg-card p-6 shadow-sm hover:-translate-y-0.5 hover:border-primary/40 transition-all"
               >
-                <h3 className="font-heading text-xl font-bold">{p.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{p.excerpt}</p>
+                <div className="flex flex-wrap gap-1 text-[10px] font-bold uppercase tracking-wider text-primary">
+                  {p.tags.slice(0, 2).map((t: string) => (
+                    <span key={t} className="rounded-full bg-primary/10 px-2 py-0.5">{t}</span>
+                  ))}
+                </div>
+                <h3 className="mt-2 font-heading text-lg font-bold">{p.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground line-clamp-3">{p.excerpt}</p>
               </Link>
             ))}
           </div>

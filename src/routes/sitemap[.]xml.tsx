@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { services, site } from "@/data/site";
-import { cities } from "@/data/cities";
-import { posts } from "@/data/blog";
+import { getPublishedCities, getPublishedPosts } from "@/lib/content.functions";
 
 interface Entry {
   path: string;
@@ -12,7 +11,7 @@ interface Entry {
 
 const TODAY = () => new Date().toISOString().slice(0, 10);
 
-function buildEntries(): Entry[] {
+async function buildEntries(): Promise<Entry[]> {
   const today = TODAY();
   const staticPages: Entry[] = [
     { path: "/", priority: "1.0", changefreq: "weekly", lastmod: today },
@@ -30,22 +29,25 @@ function buildEntries(): Entry[] {
     lastmod: today,
   }));
 
+  const [cities, posts] = await Promise.all([getPublishedCities(), getPublishedPosts()]);
+
   const cityEntries: Entry[] = cities.map((c) => ({
     path: `/city/${c.slug}`,
     priority: "0.8",
     changefreq: "monthly",
-    lastmod: c.updatedAt,
+    lastmod: c.updatedAt || today,
   }));
 
   const postEntries: Entry[] = posts.map((p) => ({
     path: `/blog/${p.slug}`,
     priority: "0.7",
     changefreq: "monthly",
-    lastmod: p.updatedAt,
+    lastmod: p.updatedAt || today,
   }));
 
   return [...staticPages, ...serviceEntries, ...cityEntries, ...postEntries];
 }
+
 
 function renderXml(origin: string, entries: Entry[]): string {
   const urls = entries
@@ -73,7 +75,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         const proto = request.headers.get("x-forwarded-proto") ?? url.protocol.replace(":", "");
         const host = request.headers.get("host") ?? site.domain;
         const origin = `${proto}://${host}`;
-        return new Response(renderXml(origin, buildEntries()), {
+        return new Response(renderXml(origin, await buildEntries()), {
           headers: {
             "Content-Type": "application/xml; charset=utf-8",
             "Cache-Control": "public, max-age=3600",

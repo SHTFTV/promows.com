@@ -1,20 +1,23 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { CheckCircle2, MapPin } from "lucide-react";
-import { cityBySlug, cities } from "@/data/cities";
+import { getPublishedCity, getPublishedCities } from "@/lib/content.functions";
 import { serviceBySlug, site, SITE_URL, LOGO_URL, OG_IMAGE_URL, seoLinks } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
+import type { City } from "@/data/cities";
 
 export const Route = createFileRoute("/city/$slug")({
-  loader: ({ params }) => {
-    const city = cityBySlug(params.slug);
+  loader: async ({ params }) => {
+    const [city, all] = await Promise.all([
+      getPublishedCity({ data: { slug: params.slug } }),
+      getPublishedCities(),
+    ]);
     if (!city) throw notFound();
-    return { city };
+    const otherCities = (all as City[]).filter((c) => c.slug !== city.slug);
+    return { city, otherCities };
   },
   head: ({ params, loaderData }) => {
     const c = loaderData?.city;
-    const title = c
-      ? `Lawn Care in ${c.name}, ${c.state} — ProMows`
-      : "City — ProMows";
+    const title = c ? `Lawn Care in ${c.name}, ${c.state} — ProMows` : "City — ProMows";
     const description = c
       ? `Weekly mowing, landscape design, cleanups, and fertilization across ${c.name}, ${c.state}. Trusted ProMows crews serving ${c.neighborhoods.slice(0, 3).join(", ")} and nearby.`
       : "ProMows lawn and landscape service by city.";
@@ -91,7 +94,7 @@ export const Route = createFileRoute("/city/$slug")({
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            mainEntity: c.faqs.map((f) => ({
+            mainEntity: c.faqs.map((f: { q: string; a: string }) => ({
               "@type": "Question",
               name: f.q,
               acceptedAnswer: { "@type": "Answer", text: f.a },
@@ -101,6 +104,7 @@ export const Route = createFileRoute("/city/$slug")({
       ],
     };
   },
+  errorComponent: ({ error }) => <div className="p-8" role="alert">{error.message}</div>,
   notFoundComponent: () => (
     <div className="mx-auto max-w-3xl px-4 py-24 text-center">
       <h1 className="font-heading text-4xl font-extrabold">City not found</h1>
@@ -114,11 +118,13 @@ export const Route = createFileRoute("/city/$slug")({
 });
 
 function CityPage() {
-  const { city } = Route.useLoaderData();
-  const offered = (city.services as string[])
+  const { city, otherCities } = Route.useLoaderData() as {
+    city: City;
+    otherCities: City[];
+  };
+  const offered = city.services
     .map((slug) => serviceBySlug(slug))
     .filter((s): s is NonNullable<ReturnType<typeof serviceBySlug>> => Boolean(s));
-  const otherCities = cities.filter((c) => c.slug !== city.slug);
 
   return (
     <>
@@ -156,17 +162,22 @@ function CityPage() {
       </section>
 
       <section className="mx-auto max-w-5xl px-4 py-16">
-        <h2 className="font-heading text-2xl font-extrabold md:text-3xl">Services we offer in {city.name}</h2>
+        <h2 className="font-heading text-2xl font-extrabold md:text-3xl">
+          Services we offer in {city.name}
+        </h2>
         <div className="mt-6 grid gap-5 md:grid-cols-2">
-          {offered.map((s: NonNullable<ReturnType<typeof serviceBySlug>>) => (
+          {offered.map((s) => (
             <Link
               key={s.slug}
               to="/services/$slug"
               params={{ slug: s.slug }}
               className="rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40"
             >
-              <h3 className="font-heading text-xl font-bold">{s.title}</h3>
+              <h3 className="font-heading text-xl font-bold">{s.title} in {city.name}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{s.short}</p>
+              <span className="mt-3 inline-block text-sm font-bold text-primary">
+                Learn more →
+              </span>
             </Link>
           ))}
         </div>
@@ -201,21 +212,23 @@ function CityPage() {
 
       <PartnerCallout />
 
-      <section className="mx-auto max-w-5xl px-4 py-16">
-        <h2 className="font-heading text-2xl font-extrabold">Other cities we serve</h2>
-        <div className="mt-6 flex flex-wrap gap-3">
-          {otherCities.map((c) => (
-            <Link
-              key={c.slug}
-              to="/city/$slug"
-              params={{ slug: c.slug }}
-              className="rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold hover:border-primary/40 hover:text-primary"
-            >
-              {c.name}, {c.state}
-            </Link>
-          ))}
-        </div>
-      </section>
+      {otherCities.length > 0 && (
+        <section className="mx-auto max-w-5xl px-4 py-16">
+          <h2 className="font-heading text-2xl font-extrabold">Other cities we serve</h2>
+          <div className="mt-6 flex flex-wrap gap-3">
+            {otherCities.map((c) => (
+              <Link
+                key={c.slug}
+                to="/city/$slug"
+                params={{ slug: c.slug }}
+                className="rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold hover:border-primary/40 hover:text-primary"
+              >
+                {c.name}, {c.state}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </>
   );
 }
