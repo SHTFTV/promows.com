@@ -14,16 +14,136 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      blog_posts: {
+        Row: {
+          author: string
+          body: string[]
+          created_at: string
+          excerpt: string
+          id: string
+          is_published: boolean
+          published_at: string | null
+          read_minutes: number
+          slug: string
+          tags: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author?: string
+          body?: string[]
+          created_at?: string
+          excerpt: string
+          id?: string
+          is_published?: boolean
+          published_at?: string | null
+          read_minutes?: number
+          slug: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          body?: string[]
+          created_at?: string
+          excerpt?: string
+          id?: string
+          is_published?: boolean
+          published_at?: string | null
+          read_minutes?: number
+          slug?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cities: {
+        Row: {
+          created_at: string
+          faqs: Json
+          id: string
+          intro: string
+          is_published: boolean
+          name: string
+          neighborhoods: string[]
+          published_at: string | null
+          region: string
+          services: string[]
+          slug: string
+          state: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          faqs?: Json
+          id?: string
+          intro: string
+          is_published?: boolean
+          name: string
+          neighborhoods?: string[]
+          published_at?: string | null
+          region: string
+          services?: string[]
+          slug: string
+          state: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          faqs?: Json
+          id?: string
+          intro?: string
+          is_published?: boolean
+          name?: string
+          neighborhoods?: string[]
+          published_at?: string | null
+          region?: string
+          services?: string[]
+          slug?: string
+          state?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "editor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +270,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "editor"],
+    },
   },
 } as const
