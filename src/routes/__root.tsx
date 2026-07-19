@@ -163,6 +163,38 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         type: "application/ld+json",
         children: JSON.stringify({
           "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": `${SITE_URL}/#localbusiness`,
+          name: site.name,
+          url: SITE_URL,
+          logo: LOGO_URL,
+          image: OG_IMAGE_URL,
+          email: site.email,
+          priceRange: "$$",
+          areaServed: site.serviceArea,
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: site.address.locality,
+            addressRegion: site.address.region,
+            postalCode: site.address.postalCode,
+            addressCountry: site.address.country,
+          },
+          contactPoint: [
+            {
+              "@type": "ContactPoint",
+              contactType: "customer support",
+              email: site.email,
+              areaServed: site.serviceArea,
+              availableLanguage: ["English"],
+            },
+          ],
+          sameAs: [site.partner.url],
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
           "@type": "WebSite",
           name: site.name,
           url: SITE_URL,

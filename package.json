@@ -9,7 +9,10 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "qa:mailto": "node scripts/qa-mailto.mjs",
+    "qa:jsonld": "node scripts/verify-jsonld.mjs",
+    "qa": "npm run qa:mailto && npm run qa:jsonld"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
