@@ -13,7 +13,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
-import { site } from "@/data/site";
+import { site, SITE_URL, LOGO_URL, OG_IMAGE_URL } from "@/data/site";
+
 
 function NotFoundComponent() {
   return (
@@ -96,7 +97,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Sharp lawns, thoughtful landscapes, and honest crews across North America. Winter snow services handled by our partner PlowWow.",
       },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@promows" },
       { name: "theme-color", content: "#1f6b3a" },
+
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -123,7 +126,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@context": "https://schema.org",
           "@type": "Organization",
           name: site.name,
-          url: `https://${site.domain}`,
+          url: SITE_URL,
+          logo: LOGO_URL,
+          image: OG_IMAGE_URL,
+          email: site.email,
+          telephone: site.phone,
           description:
             "Professional lawn and landscape care — mowing, landscape design, hedge and tree trimming, yard cleanups, and fertilization across North America.",
           areaServed: site.serviceArea,
@@ -136,11 +143,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@context": "https://schema.org",
           "@type": "WebSite",
           name: site.name,
-          url: `https://${site.domain}`,
+          url: SITE_URL,
         }),
       },
     ],
   }),
+
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,

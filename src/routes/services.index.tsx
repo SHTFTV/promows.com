@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, CalendarDays, Droplets, Leaf, Scissors, Sprout, TreePine } from "lucide-react";
-import { services, site } from "@/data/site";
+import { services, site, SITE_URL, OG_IMAGE_URL } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
 
 const iconMap = { Scissors, Sprout, TreePine, Leaf, Droplets, CalendarDays } as const;
@@ -15,9 +15,15 @@ export const Route = createFileRoute("/services/")({
           "Mowing, landscape design, hedge and tree trimming, yard cleanups, fertilization, and seasonal cleanups. Flat pricing, on-time crews, across North America.",
       },
       { property: "og:title", content: "Lawn & Landscape Services — ProMows" },
-      { property: "og:url", content: "/services" },
+      { property: "og:description", content: "Mowing, design, trimming, cleanups, and fertilization across North America." },
+      { property: "og:url", content: `${SITE_URL}/services` },
+      { property: "og:image", content: OG_IMAGE_URL },
+      { name: "twitter:title", content: "Lawn & Landscape Services — ProMows" },
+      { name: "twitter:description", content: "Mowing, design, trimming, cleanups, and fertilization." },
+      { name: "twitter:image", content: OG_IMAGE_URL },
     ],
     links: [{ rel: "canonical", href: "/services" }],
+
     scripts: [
       {
         type: "application/ld+json",

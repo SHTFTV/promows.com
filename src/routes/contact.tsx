@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Mail, MapPin, Phone } from "lucide-react";
-import { site } from "@/data/site";
+import { site, SITE_URL, OG_IMAGE_URL } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
 
 export const Route = createFileRoute("/contact")({
@@ -13,10 +13,16 @@ export const Route = createFileRoute("/contact")({
           "Request a free lawn or landscape quote from ProMows. Serving homeowners and property managers across North America. Response within 24 hours.",
       },
       { property: "og:title", content: "Contact ProMows" },
-      { property: "og:url", content: "/contact" },
+      { property: "og:description", content: "Free lawn & landscape quotes. Response within 24 hours." },
+      { property: "og:url", content: `${SITE_URL}/contact` },
+      { property: "og:image", content: OG_IMAGE_URL },
+      { name: "twitter:title", content: "Contact ProMows" },
+      { name: "twitter:description", content: "Free lawn & landscape quotes. Response within 24 hours." },
+      { name: "twitter:image", content: OG_IMAGE_URL },
     ],
     links: [{ rel: "canonical", href: "/contact" }],
   }),
+
   component: Contact,
 });
 

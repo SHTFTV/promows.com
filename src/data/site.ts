@@ -13,6 +13,13 @@ export const site = {
   },
 } as const;
 
+// Absolute URLs used in JSON-LD, og:image and twitter:image.
+// Crawlers require absolute image URLs.
+export const SITE_URL = `https://${site.domain}`;
+export const LOGO_URL = `${SITE_URL}/android-chrome-512x512.png`;
+export const OG_IMAGE_URL = `${SITE_URL}/og-image.png`;
+
+
 export type ServiceSlug =
   | "mowing"
   | "landscape-design"
