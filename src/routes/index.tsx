@@ -100,27 +100,29 @@ function HomePage() {
             </ul>
           </div>
 
-          <div className="relative">
-            <div className="aspect-[4/5] rounded-3xl bg-gradient-to-br from-primary/80 via-primary to-primary/60 p-8 shadow-2xl">
-              <div className="flex h-full flex-col justify-between text-primary-foreground">
-                <div>
-                  <div className="text-sm font-bold uppercase tracking-wider opacity-80">This week</div>
-                  <div className="mt-2 text-6xl font-extrabold">1,240</div>
-                  <div className="text-sm opacity-80">yards mowed by ProMows crews</div>
-                </div>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="rounded-xl bg-white/10 p-4">
-                    <div className="text-2xl font-extrabold">4.9★</div>
-                    <div className="opacity-80">Avg. customer rating</div>
-                  </div>
-                  <div className="rounded-xl bg-white/10 p-4">
-                    <div className="text-2xl font-extrabold">98%</div>
-                    <div className="opacity-80">On-time visits</div>
-                  </div>
-                </div>
+          <div className="relative flex items-center justify-center">
+            <div className="absolute inset-6 rounded-[3rem] bg-gradient-to-br from-primary/30 via-primary/10 to-transparent blur-2xl" aria-hidden />
+            <img
+              src={truckAsset.url}
+              alt="ProMows lawn care truck with green grass wrap"
+              className="relative w-full max-w-xl drop-shadow-2xl"
+              width={1024}
+              height={1024}
+              loading="eager"
+              fetchPriority="high"
+            />
+            <div className="absolute bottom-2 left-2 grid grid-cols-2 gap-3 text-sm md:left-6">
+              <div className="rounded-xl bg-background/90 p-3 shadow-lg backdrop-blur">
+                <div className="text-2xl font-extrabold text-primary">4.9★</div>
+                <div className="text-xs text-muted-foreground">Avg. rating</div>
+              </div>
+              <div className="rounded-xl bg-background/90 p-3 shadow-lg backdrop-blur">
+                <div className="text-2xl font-extrabold text-primary">98%</div>
+                <div className="text-xs text-muted-foreground">On-time visits</div>
               </div>
             </div>
           </div>
+
         </div>
       </section>
 
