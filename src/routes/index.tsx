@@ -189,10 +189,10 @@ function HomePage() {
       </section>
 
       {/* HIRING PROS */}
-      <section className="border-b border-border bg-foreground text-background">
+      <section className="border-b border-border bg-muted">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-4 py-10 text-center md:flex-row md:justify-between md:text-left">
           <div>
-            <span className="inline-flex items-center rounded-full bg-primary/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary ring-1 ring-primary/40">
+            <span className="inline-flex items-center rounded-full bg-primary/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary ring-1 ring-primary/30">
               Now hiring
             </span>
             <h2 className="mt-3 font-heading text-2xl font-extrabold md:text-3xl">
