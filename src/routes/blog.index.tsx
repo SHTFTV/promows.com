@@ -87,7 +87,7 @@ function BlogIndex() {
                 className="group block h-full rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg"
               >
                 <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-primary">
-                  {p.tags.slice(0, 2).map((t) => (
+                  {p.tags.slice(0, 2).map((t: string) => (
                     <span key={t} className="rounded-full bg-primary/10 px-2 py-0.5">{t}</span>
                   ))}
                 </div>
