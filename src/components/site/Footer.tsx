@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Leaf, Mail, Phone, Snowflake } from "lucide-react";
+import { Leaf, Mail, Snowflake } from "lucide-react";
 import { services, site } from "@/data/site";
 
 export function Footer() {
@@ -18,9 +18,6 @@ export function Footer() {
             {site.tagline}. Serving homeowners and property managers across {site.serviceArea}.
           </p>
           <div className="mt-4 space-y-1 text-sm">
-            <a href={`tel:${site.phone.replace(/\D/g, "")}`} className="flex items-center gap-2 hover:underline">
-              <Phone className="h-4 w-4" aria-hidden /> {site.phone}
-            </a>
             <a href={`mailto:${site.email}`} className="flex items-center gap-2 hover:underline">
               <Mail className="h-4 w-4" aria-hidden /> {site.email}
             </a>

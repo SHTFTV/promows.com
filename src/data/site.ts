@@ -2,8 +2,7 @@ export const site = {
   name: "ProMows",
   tagline: "Professional Lawn & Landscape Care",
   domain: "promows.com",
-  phone: "(000) 000-0000",
-  email: "hello@promows.com",
+  email: "info@promows.com",
   serviceArea: "North America",
   locale: "en_US",
   partner: {
