@@ -1,6 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, HeartHandshake, Repeat, Shield, Snowflake, Users } from "lucide-react";
 import { site } from "@/data/site";
+import heroVideo from "@/assets/promows-hero.mp4.asset.json";
+import truckAsset from "@/assets/promows-truck.png.asset.json";
+
 
 export const Route = createFileRoute("/partners")({
   head: () => ({
@@ -40,19 +43,32 @@ export const Route = createFileRoute("/partners")({
 function Partners() {
   return (
     <>
-      <section className="border-b border-border bg-accent/30">
-        <div className="mx-auto max-w-4xl px-4 py-16 md:py-24">
-          <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--partner)]/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[color:var(--partner)]">
+      <section className="relative overflow-hidden border-b border-border bg-foreground text-background">
+        <video
+          src={heroVideo.url}
+          poster={truckAsset.url}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover opacity-40"
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/80 to-transparent" aria-hidden />
+        <div className="relative mx-auto max-w-4xl px-4 py-20 md:py-28">
+          <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--partner)]/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[color:var(--partner)]">
             <HeartHandshake className="h-3.5 w-3.5" aria-hidden /> Partnership
           </span>
+
           <h1 className="mt-4 font-heading text-4xl font-extrabold md:text-5xl">
             ProMows &amp; PlowWow — one team, all four seasons.
           </h1>
-          <p className="mt-4 text-lg text-muted-foreground">
+          <p className="mt-4 text-lg text-background/80">
             Your property has two jobs: keep it green in the growing months and keep it safe when
             the snow flies. ProMows handles the first. PlowWow handles the second. Same standards.
             Same insurance requirements. One less company to vet.
           </p>
+
           <div className="mt-6 flex flex-wrap gap-3">
             <a
               href={site.partner.url}
