@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { services, site, SITE_URL, LOGO_URL, OG_IMAGE_URL, seoLinks } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
-import heroSquare from "@/assets/promows-hero-square.png.asset.json";
+import heroSquare from "@/assets/promows-hero-square-clean.png";
 
 
 const iconMap = {
@@ -112,7 +112,7 @@ function HomePage() {
           <div className="relative">
             <div className="overflow-hidden rounded-[2.5rem] ring-1 ring-primary/20 shadow-2xl">
               <img
-                src={heroSquare.url}
+                src={heroSquare}
                 alt="ProMows Lawn Care truck and trailer parked at a beautifully landscaped property"
                 className="h-full w-full object-cover"
                 width={1024}
