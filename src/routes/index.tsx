@@ -143,6 +143,31 @@ function HomePage() {
         </div>
       </section>
 
+      {/* FOUNDING NEIGHBORHOOD OFFER */}
+      <section className="border-y border-primary/20 bg-gradient-to-r from-primary via-primary to-primary/90 text-primary-foreground">
+        <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-4 py-10 text-center md:flex-row md:justify-between md:text-left">
+          <div className="flex items-center gap-4">
+            <span className="inline-flex items-center rounded-full bg-background/15 px-3 py-1 text-xs font-bold uppercase tracking-wider ring-1 ring-background/30">
+              Founding offer
+            </span>
+            <div>
+              <h2 className="font-heading text-2xl font-extrabold md:text-3xl">
+                Claim your neighborhood from just $10/month
+              </h2>
+              <p className="mt-1 text-sm opacity-90 md:text-base">
+                Exclusive — one household per block locks in founding pricing before we open your area.
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/contact"
+            className="inline-flex items-center gap-2 rounded-lg bg-background px-6 py-3 font-bold text-primary shadow-lg transition-transform hover:-translate-y-0.5"
+          >
+            Join &amp; claim my block <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </section>
+
       {/* SERVICES */}
       <section className="mx-auto max-w-7xl px-4 py-20" aria-labelledby="home-services">
         <div className="mb-10 max-w-2xl">
