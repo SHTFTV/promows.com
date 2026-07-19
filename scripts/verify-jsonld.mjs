@@ -4,30 +4,65 @@
  * running server and validates the emitted JSON-LD in the RAW SSR HTML
  * (no client JS execution).
  *
- * For each URL we assert:
+ * Assertions per URL:
  *   - HTTP 200
- *   - Organization or LocalBusiness JSON-LD with well-formed PostalAddress
- *     (streetAddress, addressLocality, addressRegion) and a ContactPoint /
- *     top-level email of info@promows.com
+ *   - Organization/LocalBusiness w/ well-formed PostalAddress + ContactPoint
+ *     email = info@promows.com
  *   - City routes: BreadcrumbList AND FAQPage present in raw HTML
  *   - Blog routes: BreadcrumbList present in raw HTML
- *   - If AggregateRating is present, ratingValue + reviewCount are numeric
+ *   - If AggregateRating present → ratingValue/reviewCount numeric
+ *   - If WebPage present → has name + url
+ *   - If ItemList present → itemListElement is a non-empty array w/ positions
  *
- * Outputs per-route JSON to qa-reports/jsonld/<slug>.json and a combined
- * qa-reports/jsonld/results.ndjson (one JSON object per line, machine-
- * readable) plus qa-reports/jsonld/summary.json.
+ * Outputs:
+ *   qa-reports/jsonld/results.ndjson    one JSON per route
+ *   qa-reports/jsonld/<slug>.json       per-route detail
+ *   qa-reports/jsonld/<slug>.html       raw HTML snippet on failure
+ *   qa-reports/jsonld/snapshots/<slug>.json  extracted JSON-LD blocks (all runs)
+ *   qa-reports/jsonld/diff.json + diff.txt  vs previous snapshot dir
+ *   qa-reports/jsonld/summary.json      combined summary
+ *
+ * Filtering (allow/deny — patterns are substrings OR /regex/):
+ *   QA_ONLY="/city/austin,/blog/spring"   only these routes
+ *   QA_SKIP="/city/beta-,/blog/draft-"    skip these
+ *   QA_ONLY="/regex:^/city/"              regex form
+ *   --only=<pat> / --skip=<pat>           CLI overrides
  *
  * Usage:
  *   BASE_URL=http://localhost:8080 node scripts/verify-jsonld.mjs
  */
 import { XMLParser } from "fast-xml-parser";
-import { mkdir, writeFile, appendFile, rm } from "node:fs/promises";
+import { mkdir, writeFile, appendFile, rm, readFile, cp, readdir } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 const BASE = process.env.BASE_URL || "http://localhost:8080";
 const EMAIL = "info@promows.com";
 const REPORT_DIR = "qa-reports/jsonld";
+const SNAPSHOT_DIR = join(REPORT_DIR, "snapshots");
+const PREV_SNAPSHOT_DIR = "qa-reports/jsonld-prev/snapshots";
 const NDJSON = join(REPORT_DIR, "results.ndjson");
+
+// --- filter parsing ------------------------------------------------------
+function parseArg(name) {
+  const hit = process.argv.find((a) => a.startsWith(`--${name}=`));
+  return hit ? hit.slice(name.length + 3) : "";
+}
+function toMatchers(raw) {
+  if (!raw) return [];
+  return raw.split(",").map((s) => s.trim()).filter(Boolean).map((s) => {
+    if (s.startsWith("/regex:")) return new RegExp(s.slice(7));
+    if (s.startsWith("/") && s.endsWith("/") && s.length > 2) return new RegExp(s.slice(1, -1));
+    return s;
+  });
+}
+const ONLY = toMatchers(parseArg("only") || process.env.QA_ONLY || "");
+const SKIP = toMatchers(parseArg("skip") || process.env.QA_SKIP || "");
+const matches = (path, m) => (m instanceof RegExp ? m.test(path) : path.includes(m));
+const passesFilter = (path) =>
+  (!ONLY.length || ONLY.some((m) => matches(path, m))) &&
+  !SKIP.some((m) => matches(path, m));
+
 
 async function loadUrlsFromSitemap() {
   const res = await fetch(`${BASE}/sitemap.xml`);
