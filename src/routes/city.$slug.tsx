@@ -115,9 +115,9 @@ export const Route = createFileRoute("/city/$slug")({
 
 function CityPage() {
   const { city } = Route.useLoaderData();
-  const offered = city.services
-    .map((slug) => serviceBySlug(slug))
-    .filter((s): s is NonNullable<ReturnType<typeof serviceBySlug>> => Boolean(s));
+  const offered = city.services as string[]
+    .map((slug: string) => serviceBySlug(slug))
+    .filter((s: ReturnType<typeof serviceBySlug>): s is NonNullable<ReturnType<typeof serviceBySlug>> => Boolean(s));
   const otherCities = cities.filter((c) => c.slug !== city.slug);
 
   return (
@@ -158,7 +158,7 @@ function CityPage() {
       <section className="mx-auto max-w-5xl px-4 py-16">
         <h2 className="font-heading text-2xl font-extrabold md:text-3xl">Services we offer in {city.name}</h2>
         <div className="mt-6 grid gap-5 md:grid-cols-2">
-          {offered.map((s) => (
+          {offered.map((s: NonNullable<ReturnType<typeof serviceBySlug>>) => (
             <Link
               key={s.slug}
               to="/services/$slug"
@@ -176,7 +176,7 @@ function CityPage() {
         <div className="mx-auto max-w-5xl px-4">
           <h2 className="font-heading text-2xl font-extrabold md:text-3xl">Neighborhoods we cover</h2>
           <ul className="mt-6 grid grid-cols-2 gap-3 text-foreground md:grid-cols-3">
-            {city.neighborhoods.map((n) => (
+            {city.neighborhoods.map((n: string) => (
               <li key={n} className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-primary" aria-hidden /> {n}
               </li>
@@ -190,7 +190,7 @@ function CityPage() {
           {city.name} lawn care FAQs
         </h2>
         <dl className="mt-6 space-y-6">
-          {city.faqs.map((f) => (
+          {city.faqs.map((f: { q: string; a: string }) => (
             <div key={f.q} className="rounded-xl border border-border bg-card p-5 shadow-sm">
               <dt className="font-heading text-lg font-bold text-foreground">{f.q}</dt>
               <dd className="mt-2 text-muted-foreground">{f.a}</dd>

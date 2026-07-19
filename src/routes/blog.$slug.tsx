@@ -111,7 +111,7 @@ function BlogPostPage() {
               <span className="text-foreground">{post.title}</span>
             </nav>
             <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-primary">
-              {post.tags.map((t) => (
+              {post.tags.map((t: string) => (
                 <span key={t} className="rounded-full bg-primary/10 px-2 py-0.5">
                   {t}
                 </span>
@@ -140,7 +140,7 @@ function BlogPostPage() {
 
         <div className="mx-auto max-w-3xl px-4 py-14">
           <div className="prose prose-lg max-w-none">
-            {post.body.map((para, i) => (
+            {post.body.map((para: string, i: number) => (
               <p key={i} className="mb-5 text-lg leading-relaxed text-foreground">
                 {para}
               </p>
