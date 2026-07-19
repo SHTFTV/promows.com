@@ -144,16 +144,6 @@ function HomePage() {
               </div>
             </div>
           </div>
-              <div className="rounded-xl bg-background/90 p-3 shadow-lg backdrop-blur">
-                <div className="text-2xl font-extrabold text-primary">4.9★</div>
-                <div className="text-xs text-muted-foreground">Avg. rating</div>
-              </div>
-              <div className="rounded-xl bg-background/90 p-3 shadow-lg backdrop-blur">
-                <div className="text-2xl font-extrabold text-primary">98%</div>
-                <div className="text-xs text-muted-foreground">On-time visits</div>
-              </div>
-            </div>
-          </div>
 
         </div>
       </section>
