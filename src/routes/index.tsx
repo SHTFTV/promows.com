@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { services, site } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
+import truckAsset from "@/assets/promows-truck.png.asset.json";
+
 
 const iconMap = {
   Scissors,
