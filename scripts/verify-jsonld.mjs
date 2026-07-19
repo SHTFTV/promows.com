@@ -189,10 +189,46 @@ function assertRoute(path, html) {
            nodes.some((n) => n.aggregateRating))
     record("aggregate_rating", true, "well-formed");
 
+  // WebPage (when present): must have name + url
+  if (hasType(nodes, "WebPage")) {
+    const wp = nodes.find((n) => typesOf(n).includes("WebPage"));
+    const missing = ["name", "url"].filter((k) => !wp?.[k] || String(wp[k]).trim() === "");
+    record("webpage", missing.length === 0,
+      missing.length ? `WebPage missing: ${missing.join(", ")}` : `url=${wp.url}`);
+  }
+
+  // ItemList (when present): non-empty itemListElement w/ positions
+  if (hasType(nodes, "ItemList")) {
+    const il = nodes.find((n) => typesOf(n).includes("ItemList"));
+    const items = Array.isArray(il?.itemListElement) ? il.itemListElement : [];
+    if (!items.length) {
+      record("item_list", false, "ItemList.itemListElement empty");
+    } else {
+      const bad = items.filter((it, i) => {
+        const pos = Number(it?.position);
+        return !Number.isFinite(pos) || pos !== i + 1 || !(it?.url || it?.item);
+      });
+      record("item_list", bad.length === 0,
+        bad.length ? `${bad.length} ItemList entries missing position/url` : `${items.length} items`);
+    }
+  }
+
   const entityTypes = [...new Set(nodes.flatMap(typesOf).filter(Boolean))];
+  const rawBlocks = collectRawBlocks(html);
   const ok = assertions.every((a) => a.ok);
-  return { ok, entityTypes, assertions, routeKind: isCity ? "city" : isBlog ? "blog" : "other" };
+  return { ok, entityTypes, assertions, rawBlocks,
+    routeKind: isCity ? "city" : isBlog ? "blog" : "other" };
 }
+
+// Return the exact raw JSON-LD block strings, sorted for stable diffs.
+function collectRawBlocks(html) {
+  const blocks = [];
+  const re = new RegExp(JSONLD_RE.source, "gi");
+  let m;
+  while ((m = re.exec(html))) blocks.push(m[1].trim());
+  return blocks.sort();
+}
+
 
 const slugify = (p) =>
   p.replace(/[^a-z0-9]+/gi, "_").replace(/^_|_$/g, "") || "root";
