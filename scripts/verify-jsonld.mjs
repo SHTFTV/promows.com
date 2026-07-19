@@ -233,16 +233,30 @@ function collectRawBlocks(html) {
 const slugify = (p) =>
   p.replace(/[^a-z0-9]+/gi, "_").replace(/^_|_$/g, "") || "root";
 
+// Preserve previous run's snapshots for diffing before wiping.
+await rm(PREV_SNAPSHOT_DIR, { recursive: true, force: true });
+if (existsSync(SNAPSHOT_DIR)) {
+  await mkdir("qa-reports/jsonld-prev", { recursive: true });
+  await cp(SNAPSHOT_DIR, PREV_SNAPSHOT_DIR, { recursive: true });
+}
 await rm(REPORT_DIR, { recursive: true, force: true });
-await mkdir(REPORT_DIR, { recursive: true });
+await mkdir(SNAPSHOT_DIR, { recursive: true });
 
-const urls = await loadUrlsFromSitemap();
-if (!urls.length) {
+const allUrls = await loadUrlsFromSitemap();
+if (!allUrls.length) {
   console.error("No /city or /blog URLs found in sitemap.xml — nothing to check.");
   process.exit(1);
 }
+const urls = allUrls.filter(passesFilter);
+const skipped = allUrls.length - urls.length;
+if (!urls.length) {
+  console.error(`Filters excluded all ${allUrls.length} URLs. Adjust --only/--skip / QA_ONLY / QA_SKIP.`);
+  process.exit(1);
+}
 
-console.log(`Checking ${urls.length} URL(s) at ${BASE}\n`);
+console.log(`Checking ${urls.length} URL(s) at ${BASE}` +
+  (skipped ? ` (${skipped} filtered out)` : "") + "\n");
+
 const failures = [];
 const allResults = [];
 for (const path of urls) {
