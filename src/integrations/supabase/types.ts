@@ -107,6 +107,99 @@ export type Database = {
         }
         Relationships: []
       }
+      founding_signups: {
+        Row: {
+          address: string | null
+          city: string | null
+          created_at: string
+          email: string
+          id: string
+          notes: string | null
+          state: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          notes?: string | null
+          state?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          notes?: string | null
+          state?: string | null
+        }
+        Relationships: []
+      }
+      portfolio_photos: {
+        Row: {
+          caption: string | null
+          created_at: string
+          id: string
+          is_approved: boolean
+          storage_path: string
+          uploader_email: string | null
+          uploader_name: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          is_approved?: boolean
+          storage_path: string
+          uploader_email?: string | null
+          uploader_name: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          is_approved?: boolean
+          storage_path?: string
+          uploader_email?: string | null
+          uploader_name?: string
+        }
+        Relationships: []
+      }
+      pro_applications: {
+        Row: {
+          created_at: string
+          description: string
+          email: string | null
+          id: string
+          name: string
+          phone: string
+          service_area: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          email?: string | null
+          id?: string
+          name: string
+          phone: string
+          service_area: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string
+          service_area?: string
+          status?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
