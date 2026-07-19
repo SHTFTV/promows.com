@@ -61,10 +61,21 @@ jobs:
           done
           echo "::error::Preview not reachable at $BASE_URL"; exit 1
 
+      - name: Restore previous JSON-LD snapshots (for diff)
+        uses: actions/cache@v4
+        with:
+          path: qa-reports/jsonld/snapshots
+          key: qa-jsonld-snapshots-${{ github.base_ref || github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            qa-jsonld-snapshots-${{ github.base_ref || github.ref_name }}-
+            qa-jsonld-snapshots-
+
       - name: qa:mailto
         id: qa_mailto
         env:
           BASE_URL: ${{ steps.preview.outputs.url }}
+          QA_ONLY: ${{ vars.QA_ONLY }}
+          QA_SKIP: ${{ vars.QA_SKIP }}
         run: node scripts/qa-mailto.mjs
 
       - name: qa:jsonld
@@ -72,11 +83,17 @@ jobs:
         if: always()
         env:
           BASE_URL: ${{ steps.preview.outputs.url }}
+          QA_ONLY: ${{ vars.QA_ONLY }}
+          QA_SKIP: ${{ vars.QA_SKIP }}
         run: node scripts/verify-jsonld.mjs
 
-      - name: Upload QA failure artifacts
+      - name: qa:report (summary.html)
+        if: always()
+        run: node scripts/qa-report-html.mjs
+
+      - name: Upload QA artifacts
         id: upload
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: qa-reports-pr-${{ github.event.pull_request.number || github.run_id }}
