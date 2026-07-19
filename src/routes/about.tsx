@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Award, HeartHandshake, Leaf, ShieldCheck, Users } from "lucide-react";
-import { site } from "@/data/site";
+import { site, SITE_URL, OG_IMAGE_URL } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
 
 export const Route = createFileRoute("/about")({
@@ -13,10 +13,16 @@ export const Route = createFileRoute("/about")({
           "ProMows is a network of professional lawn and landscape crews serving North America. Same-crew consistency, flat pricing, and a year-round partnership with PlowWow for winter services.",
       },
       { property: "og:title", content: "About ProMows" },
-      { property: "og:url", content: "/about" },
+      { property: "og:description", content: "Same-crew consistency, flat pricing, and year-round property care across North America." },
+      { property: "og:url", content: `${SITE_URL}/about` },
+      { property: "og:image", content: OG_IMAGE_URL },
+      { name: "twitter:title", content: "About ProMows" },
+      { name: "twitter:description", content: "Same-crew consistency, flat pricing, year-round property care." },
+      { name: "twitter:image", content: OG_IMAGE_URL },
     ],
     links: [{ rel: "canonical", href: "/about" }],
   }),
+
   component: About,
 });
 

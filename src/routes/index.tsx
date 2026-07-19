@@ -10,7 +10,7 @@ import {
   Star,
   TreePine,
 } from "lucide-react";
-import { services, site } from "@/data/site";
+import { services, site, SITE_URL, LOGO_URL, OG_IMAGE_URL } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
 import truckAsset from "@/assets/promows-truck.png.asset.json";
 
@@ -34,7 +34,13 @@ export const Route = createFileRoute("/")({
           "Reliable weekly mowing, landscape design, hedge and tree trimming, cleanups, and fertilization. Serving homeowners and property managers across North America. Winter services by our partner PlowWow.",
       },
       { property: "og:title", content: "ProMows — Lawn & Landscape Care" },
-      { property: "og:url", content: "/" },
+      { property: "og:description", content: "Sharp lawns, thoughtful landscapes, honest crews. Year-round property care across North America." },
+      { property: "og:url", content: `${SITE_URL}/` },
+      { property: "og:image", content: OG_IMAGE_URL },
+      { property: "og:image:alt", content: "ProMows Lawn Care" },
+      { name: "twitter:title", content: "ProMows — Lawn & Landscape Care" },
+      { name: "twitter:description", content: "Sharp lawns, thoughtful landscapes, honest crews across North America." },
+      { name: "twitter:image", content: OG_IMAGE_URL },
     ],
     links: [{ rel: "canonical", href: "/" }],
     scripts: [
@@ -43,17 +49,20 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "LocalBusiness",
+          "@id": `${SITE_URL}/#business`,
           name: site.name,
-          url: `https://${site.domain}`,
+          url: SITE_URL,
+          logo: LOGO_URL,
+          image: OG_IMAGE_URL,
           telephone: site.phone,
           email: site.email,
           areaServed: site.serviceArea,
           priceRange: "$$",
-          image: `https://${site.domain}/og-home.jpg`,
         }),
       },
     ],
   }),
+
   component: HomePage,
 });
 

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowRight, CalendarDays, CheckCircle2, Droplets, Leaf, Scissors, Sprout, TreePine } from "lucide-react";
-import { serviceBySlug, services, site } from "@/data/site";
+import { serviceBySlug, services, site, SITE_URL, LOGO_URL, OG_IMAGE_URL } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
 
 const iconMap = { Scissors, Sprout, TreePine, Leaf, Droplets, CalendarDays } as const;
@@ -22,7 +22,11 @@ export const Route = createFileRoute("/services/$slug")({
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
-        { property: "og:url", content: `/services/${params.slug}` },
+        { property: "og:url", content: `${SITE_URL}/services/${params.slug}` },
+        { property: "og:image", content: OG_IMAGE_URL },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
+        { name: "twitter:image", content: OG_IMAGE_URL },
         ...(s ? [] : [{ name: "robots", content: "noindex" }]),
       ],
       links: [{ rel: "canonical", href: `/services/${params.slug}` }],
@@ -35,9 +39,10 @@ export const Route = createFileRoute("/services/$slug")({
                 "@type": "Service",
                 name: s.title,
                 description: s.description,
-                provider: { "@type": "Organization", name: site.name, url: `https://${site.domain}` },
+                provider: { "@type": "Organization", name: site.name, url: SITE_URL, logo: LOGO_URL },
                 areaServed: site.serviceArea,
-                url: `https://${site.domain}/services/${s.slug}`,
+                url: `${SITE_URL}/services/${s.slug}`,
+                image: OG_IMAGE_URL,
               }),
             },
             {
@@ -46,15 +51,16 @@ export const Route = createFileRoute("/services/$slug")({
                 "@context": "https://schema.org",
                 "@type": "BreadcrumbList",
                 itemListElement: [
-                  { "@type": "ListItem", position: 1, name: "Home", item: `https://${site.domain}/` },
-                  { "@type": "ListItem", position: 2, name: "Services", item: `https://${site.domain}/services` },
-                  { "@type": "ListItem", position: 3, name: s.title, item: `https://${site.domain}/services/${s.slug}` },
+                  { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
+                  { "@type": "ListItem", position: 2, name: "Services", item: `${SITE_URL}/services` },
+                  { "@type": "ListItem", position: 3, name: s.title, item: `${SITE_URL}/services/${s.slug}` },
                 ],
               }),
             },
           ]
         : [],
     };
+
   },
   notFoundComponent: () => (
     <div className="mx-auto max-w-3xl px-4 py-24 text-center">
