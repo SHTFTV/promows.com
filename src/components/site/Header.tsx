@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Menu, Phone, Snowflake, X } from "lucide-react";
+import { Mail, Menu, Snowflake, X } from "lucide-react";
 import { useState } from "react";
 import { site } from "@/data/site";
 import logoAsset from "@/assets/promows-logo.png.asset.json";
@@ -23,9 +23,9 @@ export function Header() {
       {/* Top strip: PlowWow partner cross-link, always visible */}
       <div className="bg-[color:var(--topbar-bg)] text-[color:var(--topbar-foreground)] text-xs">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2">
-          <a href={`tel:${site.phone.replace(/\D/g, "")}`} className="inline-flex items-center gap-1.5 hover:opacity-80">
-            <Phone className="h-3.5 w-3.5" aria-hidden />
-            <span>{site.phone}</span>
+          <a href={`mailto:${site.email}`} className="inline-flex items-center gap-1.5 hover:opacity-80">
+            <Mail className="h-3.5 w-3.5" aria-hidden />
+            <span>{site.email}</span>
           </a>
           <a
             href={site.partner.url}

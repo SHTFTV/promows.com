@@ -88,7 +88,6 @@ function Contact() {
           <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
             <h2 className="font-heading text-lg font-bold">Direct</h2>
             <ul className="mt-3 space-y-2 text-sm">
-              <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-primary" /> <a href={`tel:${site.phone.replace(/\D/g, "")}`} className="hover:underline">{site.phone}</a></li>
               <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-primary" /> <a href={`mailto:${site.email}`} className="hover:underline">{site.email}</a></li>
               <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /> {site.serviceArea}</li>
             </ul>
