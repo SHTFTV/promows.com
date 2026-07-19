@@ -1,29 +1,33 @@
 #!/usr/bin/env node
 /**
  * Build-time verification: fetches every /city/* and /blog/* URL from the
- * running server and validates the emitted Organization / LocalBusiness
- * JSON-LD.
+ * running server and validates the emitted JSON-LD in the RAW SSR HTML
+ * (no client JS execution).
  *
  * For each URL we assert:
  *   - HTTP 200
- *   - An Organization or LocalBusiness JSON-LD block is present
- *   - It contains a well-formed PostalAddress (streetAddress, addressLocality,
- *     addressRegion)
- *   - It contains a ContactPoint (or top-level `email`) with info@promows.com
+ *   - Organization or LocalBusiness JSON-LD with well-formed PostalAddress
+ *     (streetAddress, addressLocality, addressRegion) and a ContactPoint /
+ *     top-level email of info@promows.com
+ *   - City routes: BreadcrumbList AND FAQPage present in raw HTML
+ *   - Blog routes: BreadcrumbList present in raw HTML
+ *   - If AggregateRating is present, ratingValue + reviewCount are numeric
  *
- * Per-route failures are written to qa-reports/jsonld/<slug>.{html,json}
- * so you can inspect the offending HTML and parsed reason.
+ * Outputs per-route JSON to qa-reports/jsonld/<slug>.json and a combined
+ * qa-reports/jsonld/results.ndjson (one JSON object per line, machine-
+ * readable) plus qa-reports/jsonld/summary.json.
  *
  * Usage:
  *   BASE_URL=http://localhost:8080 node scripts/verify-jsonld.mjs
  */
 import { XMLParser } from "fast-xml-parser";
-import { mkdir, writeFile, rm } from "node:fs/promises";
+import { mkdir, writeFile, appendFile, rm } from "node:fs/promises";
 import { join } from "node:path";
 
 const BASE = process.env.BASE_URL || "http://localhost:8080";
 const EMAIL = "info@promows.com";
 const REPORT_DIR = "qa-reports/jsonld";
+const NDJSON = join(REPORT_DIR, "results.ndjson");
 
 async function loadUrlsFromSitemap() {
   const res = await fetch(`${BASE}/sitemap.xml`);
@@ -39,7 +43,8 @@ async function loadUrlsFromSitemap() {
     .map((u) => u.replace(/^https?:\/\/[^/]+/, ""));
 }
 
-const JSONLD_RE = /<script[^>]+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi;
+const JSONLD_RE =
+  /<script[^>]+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function collectNodes(html) {
@@ -51,7 +56,7 @@ function collectNodes(html) {
       const parsed = JSON.parse(raw);
       const arr = Array.isArray(parsed) ? parsed : [parsed];
       for (const n of arr) {
-        if (n && n["@graph"] && Array.isArray(n["@graph"])) nodes.push(...n["@graph"]);
+        if (n && Array.isArray(n["@graph"])) nodes.push(...n["@graph"]);
         else nodes.push(n);
       }
     } catch {
@@ -60,21 +65,20 @@ function collectNodes(html) {
   }
   return nodes;
 }
-
-function typesOf(node) {
-  const t = node?.["@type"];
+const typesOf = (n) => {
+  const t = n?.["@type"];
   return Array.isArray(t) ? t : t ? [t] : [];
-}
+};
+const hasType = (nodes, type) =>
+  nodes.some((n) => typesOf(n).includes(type));
 
 function validateAddress(addr) {
   if (!addr || typeof addr !== "object") return "missing PostalAddress";
   const missing = ["streetAddress", "addressLocality", "addressRegion"].filter(
     (f) => !addr[f] || String(addr[f]).trim() === ""
   );
-  if (missing.length) return `PostalAddress missing: ${missing.join(", ")}`;
-  return null;
+  return missing.length ? `PostalAddress missing: ${missing.join(", ")}` : null;
 }
-
 function validateContactEmail(node) {
   const cps = Array.isArray(node.contactPoint)
     ? node.contactPoint
@@ -84,48 +88,83 @@ function validateContactEmail(node) {
   const emails = [node.email, ...cps.map((cp) => cp?.email)]
     .filter(Boolean)
     .map((e) => String(e).replace(/^mailto:/i, "").trim());
-  if (!emails.length) return "no email on Organization/LocalBusiness or ContactPoint";
-  const malformed = emails.filter((e) => !EMAIL_RE.test(e));
-  if (malformed.length) return `malformed email(s): ${malformed.join(", ")}`;
-  if (!emails.some((e) => e.toLowerCase() === EMAIL)) {
+  if (!emails.length) return "no email on Organization/LocalBusiness/ContactPoint";
+  const bad = emails.filter((e) => !EMAIL_RE.test(e));
+  if (bad.length) return `malformed email(s): ${bad.join(", ")}`;
+  if (!emails.some((e) => e.toLowerCase() === EMAIL))
     return `expected ${EMAIL}, saw: ${emails.join(", ")}`;
+  return null;
+}
+function validateAggregateRating(nodes) {
+  const ratings = nodes.flatMap((n) => {
+    const inline = n.aggregateRating;
+    const arr = typesOf(n).includes("AggregateRating") ? [n] : [];
+    return [inline, ...arr].filter(Boolean);
+  });
+  for (const r of ratings) {
+    const v = Number(r.ratingValue);
+    const c = Number(r.reviewCount ?? r.ratingCount);
+    if (!Number.isFinite(v) || v < 0 || v > 5)
+      return `AggregateRating.ratingValue invalid: ${r.ratingValue}`;
+    if (!Number.isFinite(c) || c < 0)
+      return `AggregateRating.reviewCount invalid: ${r.reviewCount ?? r.ratingCount}`;
   }
   return null;
 }
 
-function checkHtml(html) {
+function assertRoute(path, html) {
   const nodes = collectNodes(html);
-  if (!nodes.length) return { ok: false, reason: "no JSON-LD blocks emitted" };
-  const parseErrors = nodes.filter((n) => n.__rawParseError);
-  const orgs = nodes.filter((n) => {
+  const assertions = [];
+  const record = (name, ok, detail = "") =>
+    assertions.push({ name, ok, detail });
+
+  if (!nodes.length) {
+    record("jsonld_present", false, "no JSON-LD blocks emitted in raw HTML");
+    return { ok: false, entityTypes: [], assertions };
+  }
+  record("jsonld_present", true, `${nodes.length} block(s)`);
+
+  const org = nodes.find((n) => {
     const ts = typesOf(n);
     return ts.includes("Organization") || ts.includes("LocalBusiness");
   });
-  if (!orgs.length) {
-    return {
-      ok: false,
-      reason: `no Organization/LocalBusiness node (parseErrors=${parseErrors.length})`,
-    };
+  if (!org) {
+    record("organization_localbusiness", false, "no Organization/LocalBusiness node");
+  } else {
+    const addrErr = validateAddress(org.address);
+    const emailErr = validateContactEmail(org);
+    record("organization_localbusiness", !addrErr && !emailErr,
+      [addrErr, emailErr].filter(Boolean).join("; ") || `type=${typesOf(org).join(",")}`);
   }
-  const errors = [];
-  for (const node of orgs) {
-    const addrErr = validateAddress(node.address);
-    const emailErr = validateContactEmail(node);
-    if (!addrErr && !emailErr) {
-      return { ok: true, type: typesOf(node).join(",") };
-    }
-    errors.push(
-      `[${typesOf(node).join(",")}] ${[addrErr, emailErr].filter(Boolean).join("; ")}`
-    );
+
+  const isCity = path.startsWith("/city/");
+  const isBlog = path.startsWith("/blog/");
+
+  record("breadcrumb_list", hasType(nodes, "BreadcrumbList"),
+    hasType(nodes, "BreadcrumbList") ? "" : "BreadcrumbList missing in raw HTML");
+
+  if (isCity) {
+    record("faq_page", hasType(nodes, "FAQPage"),
+      hasType(nodes, "FAQPage") ? "" : "FAQPage missing in raw HTML");
   }
-  return { ok: false, reason: errors.join(" | ") };
+
+  const ratingErr = validateAggregateRating(nodes);
+  if (ratingErr) record("aggregate_rating", false, ratingErr);
+  else if (hasType(nodes, "AggregateRating") ||
+           nodes.some((n) => n.aggregateRating))
+    record("aggregate_rating", true, "well-formed");
+
+  const entityTypes = [...new Set(nodes.flatMap(typesOf).filter(Boolean))];
+  const ok = assertions.every((a) => a.ok);
+  return { ok, entityTypes, assertions, routeKind: isCity ? "city" : isBlog ? "blog" : "other" };
 }
 
-function slugify(path) {
-  return path.replace(/[^a-z0-9]+/gi, "_").replace(/^_|_$/g, "") || "root";
-}
+const slugify = (p) =>
+  p.replace(/[^a-z0-9]+/gi, "_").replace(/^_|_$/g, "") || "root";
 
 await rm(REPORT_DIR, { recursive: true, force: true });
+await mkdir(REPORT_DIR, { recursive: true });
+
 const urls = await loadUrlsFromSitemap();
 if (!urls.length) {
   console.error("No /city or /blog URLs found in sitemap.xml — nothing to check.");
@@ -134,39 +173,64 @@ if (!urls.length) {
 
 console.log(`Checking ${urls.length} URL(s) at ${BASE}\n`);
 const failures = [];
+const allResults = [];
 for (const path of urls) {
+  const url = BASE + path;
   let status = 0;
   let html = "";
   try {
-    const res = await fetch(BASE + path);
+    const res = await fetch(url);
     status = res.status;
     html = await res.text();
   } catch (e) {
-    status = 0;
     html = `<!-- fetch error: ${(e && e.message) || e} -->`;
   }
-  const check = status === 200 ? checkHtml(html) : { ok: false, reason: `HTTP ${status}` };
-  if (check.ok) {
-    console.log(`PASS ${path}  (${check.type})`);
-    continue;
-  }
-  console.log(`FAIL ${path}  ${check.reason}`);
-  failures.push({ path, status, reason: check.reason });
 
-  await mkdir(REPORT_DIR, { recursive: true });
-  const slug = slugify(path);
-  const snippet = html.slice(0, 20000);
-  await writeFile(join(REPORT_DIR, `${slug}.html`), snippet);
-  await writeFile(
-    join(REPORT_DIR, `${slug}.json`),
-    JSON.stringify({ path, status, reason: check.reason, url: BASE + path }, null, 2)
-  );
+  const result =
+    status === 200
+      ? assertRoute(path, html)
+      : { ok: false, entityTypes: [], assertions: [{ name: "http", ok: false, detail: `HTTP ${status}` }], routeKind: path.startsWith("/city/") ? "city" : "blog" };
+
+  const record = {
+    base: BASE,
+    url,
+    path,
+    status,
+    routeKind: result.routeKind,
+    entityTypes: result.entityTypes,
+    ok: result.ok,
+    failedAssertions: result.assertions.filter((a) => !a.ok),
+    assertions: result.assertions,
+  };
+  allResults.push(record);
+  await appendFile(NDJSON, JSON.stringify(record) + "\n");
+  await writeFile(join(REPORT_DIR, `${slugify(path)}.json`), JSON.stringify(record, null, 2));
+
+  if (result.ok) {
+    console.log(`PASS ${path}  [${status}] types=${result.entityTypes.join(",")}`);
+  } else {
+    const reasons = record.failedAssertions.map((a) => `${a.name}: ${a.detail}`).join(" | ");
+    console.log(`FAIL ${path}  [${status}] ${reasons}`);
+    await writeFile(join(REPORT_DIR, `${slugify(path)}.html`), html.slice(0, 20000));
+    failures.push(record);
+  }
 }
+
+await writeFile(
+  join(REPORT_DIR, "summary.json"),
+  JSON.stringify(
+    { base: BASE, email: EMAIL, total: allResults.length, failed: failures.length, failures },
+    null,
+    2
+  )
+);
 
 if (failures.length) {
   console.error(`\n${failures.length} failure(s):`);
-  for (const f of failures) console.error(`  - ${f.path} — ${f.reason}`);
-  console.error(`\nHTML snippets + reasons written to ${REPORT_DIR}/`);
+  for (const f of failures) {
+    console.error(`  - [${f.status}] ${f.path} — ${f.failedAssertions.map((a) => a.name).join(", ")}`);
+  }
+  console.error(`\nPer-route reports + HTML snippets in ${REPORT_DIR}/`);
   process.exit(1);
 }
-console.log(`\nAll city + blog pages ship valid Organization JSON-LD with ${EMAIL}.`);
+console.log(`\nAll ${allResults.length} city + blog pages emit valid JSON-LD in raw HTML.`);
