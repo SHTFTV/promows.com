@@ -75,7 +75,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         const proto = request.headers.get("x-forwarded-proto") ?? url.protocol.replace(":", "");
         const host = request.headers.get("host") ?? site.domain;
         const origin = `${proto}://${host}`;
-        return new Response(renderXml(origin, buildEntries()), {
+        return new Response(renderXml(origin, await buildEntries()), {
           headers: {
             "Content-Type": "application/xml; charset=utf-8",
             "Cache-Control": "public, max-age=3600",
