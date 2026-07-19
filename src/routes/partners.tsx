@@ -1,6 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, HeartHandshake, Repeat, Shield, Snowflake, Users } from "lucide-react";
 import { site } from "@/data/site";
+import heroVideo from "@/assets/promows-hero.mp4.asset.json";
+import truckAsset from "@/assets/promows-truck.png.asset.json";
+
 
 export const Route = createFileRoute("/partners")({
   head: () => ({
