@@ -195,10 +195,10 @@ function HomePage() {
             <span className="inline-flex items-center rounded-full bg-primary/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary ring-1 ring-primary/30">
               Now hiring
             </span>
-            <h2 className="mt-3 font-heading text-2xl font-extrabold md:text-3xl">
+            <h2 className="mt-3 font-heading text-2xl font-extrabold text-foreground md:text-3xl">
               We're looking for top-quality lawn care professionals
             </h2>
-            <p className="mt-2 max-w-2xl text-sm opacity-80 md:text-base">
+            <p className="mt-2 max-w-2xl text-sm text-muted-foreground md:text-base">
               Reliable crews, solo operators, and landscape pros — bring your standards, we'll bring the routes and steady work.
             </p>
           </div>
