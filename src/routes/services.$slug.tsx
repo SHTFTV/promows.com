@@ -101,7 +101,7 @@ function ServiceDetail() {
           <p className="text-lg leading-relaxed text-foreground">{service.description}</p>
           <h2 className="mt-8 font-heading text-2xl font-bold">What's included</h2>
           <ul className="mt-4 space-y-3">
-            {service.bullets.map((b) => (
+            {service.bullets.map((b: string) => (
               <li key={b} className="flex items-start gap-3">
                 <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
                 <span>{b}</span>
