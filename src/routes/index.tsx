@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   ArrowRight,
   CalendarDays,
@@ -12,6 +13,7 @@ import {
 } from "lucide-react";
 import { services, site, SITE_URL, LOGO_URL, OG_IMAGE_URL, seoLinks } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
+import { FoundingModal } from "@/components/site/FoundingModal";
 import heroSquare from "@/assets/promows-hero-square-clean.png";
 import logoHex from "@/assets/promows-logo-hex-transparent.png";
 
