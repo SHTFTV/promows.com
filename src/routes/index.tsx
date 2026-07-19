@@ -188,28 +188,8 @@ function HomePage() {
         </div>
       </section>
 
-      {/* HIRING PROS */}
-      <section className="border-b border-border bg-muted">
-        <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-4 py-10 text-center md:flex-row md:justify-between md:text-left">
-          <div>
-            <span className="inline-flex items-center rounded-full bg-primary/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary ring-1 ring-primary/30">
-              Now hiring
-            </span>
-            <h2 className="mt-3 font-heading text-2xl font-extrabold text-foreground md:text-3xl">
-              We're looking for top-quality lawn care professionals
-            </h2>
-            <p className="mt-2 max-w-2xl text-sm text-muted-foreground md:text-base">
-              Reliable crews, solo operators, and landscape pros — bring your standards, we'll bring the routes and steady work.
-            </p>
-          </div>
-          <Link
-            to="/pros"
-            className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-primary px-6 py-3 font-bold text-primary-foreground shadow-lg transition-transform hover:-translate-y-0.5"
-          >
-            Apply to join ProMows <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </section>
+
+
 
       {/* SERVICES */}
       <section className="mx-auto max-w-7xl px-4 py-20" aria-labelledby="home-services">
