@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Leaf, Mail, Snowflake } from "lucide-react";
+import { Leaf, Mail, MapPin, Snowflake } from "lucide-react";
 import { services, site } from "@/data/site";
 
 export function Footer() {
