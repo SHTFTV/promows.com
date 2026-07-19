@@ -174,7 +174,7 @@ function HomePage() {
               <p className="mt-1 text-sm opacity-90 md:text-base">
                 Exclusive — one household per block locks in founding pricing before we open your area.{" "}
                 <a href="#founding-faq" className="underline decoration-2 underline-offset-2 hover:opacity-100">
-                  Learn more
+                  Exclusive Territories
                 </a>
               </p>
             </div>
@@ -189,16 +189,16 @@ function HomePage() {
       </section>
 
       {/* HIRING PROS */}
-      <section className="border-b border-border bg-foreground text-background">
+      <section className="border-b border-border bg-muted">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-4 py-10 text-center md:flex-row md:justify-between md:text-left">
           <div>
-            <span className="inline-flex items-center rounded-full bg-primary/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary ring-1 ring-primary/40">
+            <span className="inline-flex items-center rounded-full bg-primary/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary ring-1 ring-primary/30">
               Now hiring
             </span>
-            <h2 className="mt-3 font-heading text-2xl font-extrabold md:text-3xl">
+            <h2 className="mt-3 font-heading text-2xl font-extrabold text-foreground md:text-3xl">
               We're looking for top-quality lawn care professionals
             </h2>
-            <p className="mt-2 max-w-2xl text-sm opacity-80 md:text-base">
+            <p className="mt-2 max-w-2xl text-sm text-muted-foreground md:text-base">
               Reliable crews, solo operators, and landscape pros — bring your standards, we'll bring the routes and steady work.
             </p>
           </div>
