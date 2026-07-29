@@ -223,17 +223,33 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      portfolio_photos_public: {
+        Row: {
+          caption: string | null
+          created_at: string | null
+          id: string | null
+          storage_path: string | null
+          uploader_name: string | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string | null
+          id?: string | null
+          storage_path?: string | null
+          uploader_name?: never
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string | null
+          id?: string | null
+          storage_path?: string | null
+          uploader_name?: never
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
-      is_staff: { Args: { _user_id: string }; Returns: boolean }
+      [_ in never]: never
     }
     Enums: {
       app_role: "admin" | "editor"
