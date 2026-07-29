@@ -323,21 +323,28 @@ function PortfolioGallery() {
     let cancelled = false;
     (async () => {
       const { data } = await supabase
-        .from("portfolio_photos")
+        .from("portfolio_photos_public")
         .select("id, storage_path, caption, uploader_name")
-        .eq("is_approved", true)
         .order("created_at", { ascending: false })
         .limit(24);
       if (cancelled || !data) {
         setLoading(false);
         return;
       }
-      const withUrls: ApprovedPhoto[] = data.map((p) => ({
-        id: p.id,
-        caption: p.caption,
-        uploader_name: p.uploader_name,
-        url: supabase.storage.from("portfolio").getPublicUrl(p.storage_path).data.publicUrl,
-      }));
+      const withUrls: ApprovedPhoto[] = [];
+      for (const p of data) {
+        if (!p.storage_path || !p.id) continue;
+        const { data: signed } = await supabase.storage
+          .from("portfolio")
+          .createSignedUrl(p.storage_path, 3600);
+        if (!signed?.signedUrl) continue;
+        withUrls.push({
+          id: p.id,
+          caption: p.caption,
+          uploader_name: p.uploader_name ?? "ProMows Pro",
+          url: signed.signedUrl,
+        });
+      }
       setPhotos(withUrls);
       setLoading(false);
     })();
