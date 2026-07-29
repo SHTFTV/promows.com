@@ -207,13 +207,19 @@ function PortfolioUpload() {
       setError("Upload failed. Please try again.");
       return;
     }
+    const photoId = crypto.randomUUID();
     const { error: dbErr } = await supabase.from("portfolio_photos").insert({
+      id: photoId,
       uploader_name: name.trim(),
-      uploader_email: email.trim() || null,
       storage_path: path,
       caption: caption.trim() || null,
       is_approved: false,
     });
+    if (!dbErr && email.trim()) {
+      await supabase
+        .from("portfolio_photo_contacts")
+        .insert({ photo_id: photoId, uploader_email: email.trim() });
+    }
     if (dbErr) {
       setStatus("error");
       setError("Saved photo but couldn't record it. Contact us.");
