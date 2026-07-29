@@ -137,6 +137,39 @@ export type Database = {
         }
         Relationships: []
       }
+      portfolio_photo_contacts: {
+        Row: {
+          created_at: string
+          photo_id: string
+          uploader_email: string | null
+        }
+        Insert: {
+          created_at?: string
+          photo_id: string
+          uploader_email?: string | null
+        }
+        Update: {
+          created_at?: string
+          photo_id?: string
+          uploader_email?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_photo_contacts_photo_id_fkey"
+            columns: ["photo_id"]
+            isOneToOne: true
+            referencedRelation: "portfolio_photos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portfolio_photo_contacts_photo_id_fkey"
+            columns: ["photo_id"]
+            isOneToOne: true
+            referencedRelation: "portfolio_photos_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       portfolio_photos: {
         Row: {
           caption: string | null
@@ -144,7 +177,6 @@ export type Database = {
           id: string
           is_approved: boolean
           storage_path: string
-          uploader_email: string | null
           uploader_name: string
         }
         Insert: {
@@ -153,7 +185,6 @@ export type Database = {
           id?: string
           is_approved?: boolean
           storage_path: string
-          uploader_email?: string | null
           uploader_name: string
         }
         Update: {
@@ -162,7 +193,6 @@ export type Database = {
           id?: string
           is_approved?: boolean
           storage_path?: string
-          uploader_email?: string | null
           uploader_name?: string
         }
         Relationships: []
