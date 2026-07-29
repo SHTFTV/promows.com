@@ -194,8 +194,9 @@ function PortfolioUpload() {
     if (!file.type.startsWith("image/")) return setError("File must be an image");
 
     setStatus("uploading");
-    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const path = `submissions/${crypto.randomUUID()}.${ext}`;
+    const rawExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const ext = ["jpg", "jpeg", "png", "webp", "heic"].includes(rawExt) ? rawExt : "jpg";
+    const path = `uploads/${crypto.randomUUID()}.${ext}`;
     const { error: upErr } = await supabase.storage.from("portfolio").upload(path, file, {
       cacheControl: "3600",
       upsert: false,
