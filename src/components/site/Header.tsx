@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Mail, Menu, Snowflake, X } from "lucide-react";
 import { useState } from "react";
 import { site } from "@/data/site";
-import logoAsset from "@/assets/promows-logo.png.asset.json";
+import logoSrc from "@/assets/promows-logo-hex-transparent.png";
 
 
 const nav = [
@@ -44,7 +44,7 @@ export function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
         <Link to="/" className="flex items-center gap-2 font-heading text-xl font-extrabold tracking-tight">
           <img
-            src={logoAsset.url}
+            src={logoSrc}
             alt="ProMows Lawn Care logo"
             width={40}
             height={40}
