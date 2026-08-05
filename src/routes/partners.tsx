@@ -1,8 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, HeartHandshake, Repeat, Shield, Snowflake, Users } from "lucide-react";
 import { site, SITE_URL, OG_IMAGE_URL, seoLinks } from "@/data/site";
-import heroVideo from "@/assets/promows-hero.mp4.asset.json";
-import truckAsset from "@/assets/promows-truck.png.asset.json";
+import heroBg from "@/assets/hero-crew-bg.jpg";
 
 
 export const Route = createFileRoute("/partners")({
@@ -50,13 +49,9 @@ function Partners() {
   return (
     <>
       <section className="relative overflow-hidden border-b border-border bg-foreground text-background">
-        <video
-          src={heroVideo.url}
-          poster={truckAsset.url}
-          autoPlay
-          muted
-          loop
-          playsInline
+        <img
+          src={heroBg}
+          alt=""
           className="absolute inset-0 h-full w-full object-cover opacity-40"
           aria-hidden
         />
