@@ -15,6 +15,7 @@ import { services, site, SITE_URL, LOGO_URL, OG_IMAGE_URL, seoLinks } from "@/da
 import { PartnerCallout } from "@/components/site/PartnerCallout";
 import { FoundingModal } from "@/components/site/FoundingModal";
 import heroSquare from "@/assets/promows-hero-square-clean.png";
+import { posts } from "@/data/blog";
 import logoHex from "@/assets/promows-logo-hex-transparent.png";
 
 
@@ -40,7 +41,8 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: "Sharp lawns, thoughtful landscapes, honest crews. Year-round property care across North America." },
       { property: "og:url", content: `${SITE_URL}/` },
       { property: "og:image", content: OG_IMAGE_URL },
-      { property: "og:image:alt", content: "ProMows Lawn Care" },
+      { property: "og:image:alt", content: "ProMows lawn care — life outside, looking its best" },
+      {property:"og:image:width",content:"1200"},{property:"og:image:height",content:"630"},{property:"og:image:type",content:"image/jpeg"},
       { name: "twitter:title", content: "ProMows — Lawn & Landscape Care" },
       { name: "twitter:description", content: "Sharp lawns, thoughtful landscapes, honest crews across North America." },
       { name: "twitter:image", content: OG_IMAGE_URL },
@@ -86,79 +88,23 @@ function HomePage() {
   const [foundingOpen, setFoundingOpen] = useState(false);
   return (
     <>
-      {/* HERO */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-accent/40 via-background to-background">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 md:grid-cols-2 md:py-24">
-          <div className="flex flex-col justify-center">
-            <span className="inline-flex w-fit items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary">
-              <Leaf className="h-3.5 w-3.5" aria-hidden /> {site.tagline}
-            </span>
-            <h1 className="mt-4 font-heading text-4xl font-extrabold leading-tight text-foreground md:text-6xl">
-              Sharp lawns.<br />Thoughtful landscapes.<br />
-              <span className="text-primary">Honest crews.</span>
-            </h1>
-            <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-              ProMows is your year-round lawn and landscape crew across {site.serviceArea}.
-              Weekly mowing, seasonal cleanups, landscape design, and fertilization — all on
-              schedule, all cleaned up.
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Link
-                to="/contact"
-                className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-bold text-primary-foreground shadow-sm transition-transform hover:-translate-y-0.5"
-              >
-                Get a free quote <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                to="/services"
-                className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-6 py-3 font-bold text-foreground hover:bg-accent"
-              >
-                See services
-              </Link>
-            </div>
-            <ul className="mt-8 grid grid-cols-2 gap-3 text-sm text-muted-foreground sm:grid-cols-3">
-              {["On-schedule crews", "Fully insured", "Flat pricing"].map((b) => (
-                <li key={b} className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-primary" aria-hidden />
-                  {b}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="relative">
-            <div className="overflow-hidden rounded-[2.5rem] ring-1 ring-primary/20 shadow-2xl">
-              <img
-                src={heroSquare}
-                alt="ProMows Lawn Care truck and trailer parked at a beautifully landscaped property"
-                className="h-full w-full object-cover"
-                width={1024}
-                height={1024}
-                loading="eager"
-                fetchPriority="high"
-              />
-            </div>
-            <div className="absolute bottom-4 left-4 grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-xl bg-background/90 p-3 shadow-lg backdrop-blur">
-                <div className="text-2xl font-extrabold text-primary">4.9★</div>
-                <div className="text-xs text-muted-foreground">Avg. rating</div>
-              </div>
-              <div className="rounded-xl bg-background/90 p-3 shadow-lg backdrop-blur">
-                <div className="text-2xl font-extrabold text-primary">98%</div>
-                <div className="text-xs text-muted-foreground">On-time visits</div>
-              </div>
-            </div>
-            <img
-              src={logoHex}
-              alt="ProMows Lawn Care logo"
-              className="absolute bottom-4 right-4 w-32 sm:w-40 md:w-48 lg:w-56 drop-shadow-2xl"
-              loading="eager"
-            />
-          </div>
-
+      <section className="pm-hero" aria-labelledby="pm-heading">
+        <img className="pm-hero-scene" src={heroSquare} alt="Illustrated ProMows truck and mowing equipment beside a landscaped lawn" fetchPriority="high" />
+        <div className="pm-hero-shade" />
+        <div className="pm-hero-content">
+          <img className="pm-hero-logo" src={logoHex} alt="ProMows Lawn Care" />
+          <p className="pm-eyebrow">A little care. A lot of curb appeal.</p>
+          <h1 id="pm-heading">Life outside.<br /><span>Looking its best.</span></h1>
+          <p>Mowing, fresh edges and seasonal cleanups. Tell us what your property needs and let’s plan the next step.</p>
+          <div className="pm-actions"><Link to="/contact" className="pm-primary">Plan your lawn care <ArrowRight size={18}/></Link><Link to="/services">Explore services →</Link></div>
         </div>
+        <p className="pm-credit">Existing ProMows concept illustration; not a photograph of a completed customer project.</p>
       </section>
-
+      <aside className="pm-enquiry" aria-label="ProMows project enquiries">
+        <details><summary><img src={logoHex} alt=""/><span>Let’s talk lawn care<small>ProMows project enquiries</small></span><span aria-hidden>+</span></summary>
+          <div className="pm-enquiry-body"><p>Your lawn. Your plans. Start with your city, property type and the work you have in mind.</p><a className="pm-primary" href={`mailto:${site.email}?subject=ProMows%20property%20enquiry`}>Email ProMows →</a><a href={`mailto:${site.email}`}>{site.email}</a><small>Service availability, scope and pricing are confirmed directly. Email opens a draft for you to send.</small></div>
+        </details>
+      </aside>
       {/* FOUNDING NEIGHBORHOOD OFFER */}
       <section className="border-y border-primary/20 bg-gradient-to-r from-primary via-primary to-primary/90 text-primary-foreground">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-4 py-10 text-center md:flex-row md:justify-between md:text-left">
@@ -246,30 +192,7 @@ function HomePage() {
         </div>
       </section>
 
-      {/* REVIEWS */}
-      <section className="mx-auto max-w-7xl px-4 py-20" aria-labelledby="home-reviews">
-        <h2 id="home-reviews" className="font-heading text-3xl font-extrabold md:text-4xl">
-          Homeowners keep us on the schedule
-        </h2>
-        <div className="mt-10 grid gap-5 md:grid-cols-3">
-          {[
-            { q: "Best lawn on the block for the first time ever. Crew is fast and tidy.", n: "Marissa T." },
-            { q: "Signed up for weekly mowing plus spring cleanup — pricing is flat, no surprises.", n: "Devon R." },
-            { q: "They also connected us to PlowWow for snow. One less thing to shop for.", n: "Angela K." },
-          ].map((r, i) => (
-            <figure key={i} className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-              <div className="flex gap-0.5 text-secondary">
-                {Array.from({ length: 5 }).map((_, j) => (
-                  <Star key={j} className="h-4 w-4 fill-current" aria-hidden />
-                ))}
-              </div>
-              <blockquote className="mt-3 text-foreground">"{r.q}"</blockquote>
-              <figcaption className="mt-3 text-sm font-semibold text-muted-foreground">— {r.n}</figcaption>
-            </figure>
-          ))}
-        </div>
-      </section>
-
+      <section className="pm-journal" aria-labelledby="pm-journal-title"><div className="pm-journal-head"><div><p className="pm-eyebrow">Notes from the growing season</p><h2 id="pm-journal-title">A better-looking yard starts here.</h2><p>Latest article published: {new Date(Math.max(...posts.map(p => Date.parse(p.publishedAt)))).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric',timeZone:'UTC'})}</p></div><Link to="/blog">All lawn care articles →</Link></div><div className="pm-journal-grid">{[...posts].sort((a,b)=>b.publishedAt.localeCompare(a.publishedAt)).slice(0,4).map((post,i)=><article key={post.slug}><div className={`pm-topic pm-topic-${i}`} aria-label={post.tags.join(', ')}>{["✂","❧","☀","♧"][i]}<span>{post.tags[0]}</span></div><div className="pm-journal-copy"><time dateTime={post.publishedAt}>{new Date(post.publishedAt+'T12:00:00Z').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric',timeZone:'UTC'})}</time><h3><Link to="/blog/$slug" params={{slug:post.slug}}>{post.title}</Link></h3><p>{post.excerpt}</p><Link to="/blog/$slug" params={{slug:post.slug}}>Read the guide →</Link></div></article>)}</div><small>Topic illustrations are editorial graphics, not project photographs.</small></section>
       <PartnerCallout />
 
       {/* FAQ */}

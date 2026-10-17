@@ -26,7 +26,7 @@ export const site = {
 // Crawlers require absolute image URLs.
 export const SITE_URL = `https://${site.domain}`;
 export const LOGO_URL = `${SITE_URL}/android-chrome-512x512.png`;
-export const OG_IMAGE_URL = `${SITE_URL}/og-image.png`;
+export const OG_IMAGE_URL = `${SITE_URL}/images/promows-share.jpg`;
 
 /**
  * Build canonical + hreflang link tags for a route.
