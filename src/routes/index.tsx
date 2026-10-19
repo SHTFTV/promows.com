@@ -14,8 +14,8 @@ import {
 import { services, site, SITE_URL, LOGO_URL, OG_IMAGE_URL, seoLinks } from "@/data/site";
 import { PartnerCallout } from "@/components/site/PartnerCallout";
 import { FoundingModal } from "@/components/site/FoundingModal";
-import heroSquare from "@/assets/promows-hero-square-clean.png";
 import { posts } from "@/data/blog";
+import { YardHeroSequence } from "@/components/site/YardHeroSequence";
 import logoHex from "@/assets/promows-logo-hex-transparent.png";
 
 
@@ -89,7 +89,7 @@ function HomePage() {
   return (
     <>
       <section className="pm-hero" aria-labelledby="pm-heading">
-        <img className="pm-hero-scene" src={heroSquare} alt="Illustrated ProMows truck and mowing equipment beside a landscaped lawn" fetchPriority="high" />
+        <YardHeroSequence />
         <div className="pm-hero-shade" />
         <div className="pm-hero-content">
           <img className="pm-hero-logo" src={logoHex} alt="ProMows Lawn Care" />
@@ -98,7 +98,7 @@ function HomePage() {
           <p>Mowing, fresh edges and seasonal cleanups. Tell us what your property needs and let’s plan the next step.</p>
           <div className="pm-actions"><Link to="/contact" className="pm-primary">Plan your lawn care <ArrowRight size={18}/></Link><Link to="/services">Explore services →</Link></div>
         </div>
-        <p className="pm-credit">Existing ProMows concept illustration; not a photograph of a completed customer project.</p>
+        <p className="pm-credit">ProMows truck concept, followed by stock yard footage: <a href="https://www.pexels.com/video/aerial-view-of-lawn-mowing-in-springtime-32388310/">Ahmet Kurt</a> and <a href="https://www.pexels.com/video/an-aerial-view-of-a-garden-with-a-walkway-27729864/">David Pickup / Pexels</a>. Not confirmed ProMows projects.</p>
       </section>
       <aside className="pm-enquiry" aria-label="ProMows project enquiries">
         <details><summary><img src={logoHex} alt=""/><span>Let’s talk lawn care<small>ProMows project enquiries</small></span><span aria-hidden>+</span></summary>
@@ -262,3 +262,4 @@ function HomePage() {
     </>
   );
 }
+
