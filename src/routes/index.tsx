@@ -94,13 +94,14 @@ function HomePage() {
         <div className="pm-hero-shade" />
         <div className="pm-hero-content">
           <img className="pm-hero-logo" src={logoHex} alt="ProMows Lawn Care" />
-          <p className="pm-eyebrow">A little care. A lot of curb appeal.</p>
-          <h1 id="pm-heading">Life outside.<br /><span>Looking its best.</span></h1>
-          <p>Mowing, fresh edges and seasonal cleanups. Tell us what your property needs and let’s plan the next step.</p>
-          <div className="pm-actions"><Link to="/contact" className="pm-primary">Plan your lawn care <ArrowRight size={18}/></Link><Link to="/services">Explore services →</Link></div>
+          
         </div>
         <p className="pm-credit">ProMows truck concept, followed by stock yard footage: <a href="https://www.pexels.com/video/aerial-view-of-lawn-mowing-in-springtime-32388310/">Ahmet Kurt</a> and <a href="https://www.pexels.com/video/an-aerial-view-of-a-garden-with-a-walkway-27729864/">David Pickup / Pexels</a>. Not confirmed ProMows projects.</p>
       </section>
+      <div className="pm-hero-writing"><p className="pm-eyebrow">A little care. A lot of curb appeal.</p>
+          <h1 id="pm-heading">Life outside. <span>Looking its best.</span></h1>
+          <p>Mowing, fresh edges and seasonal cleanups. Tell us what your property needs and let’s plan the next step.</p>
+          <div className="pm-actions"><Link to="/contact" className="pm-primary">Plan your lawn care <ArrowRight size={18}/></Link><Link to="/services">Explore services →</Link></div></div>
       <aside className="pm-enquiry" aria-label="ProMows project enquiries">
         <details><summary><img src={logoHex} alt=""/><span>Let’s talk lawn care<small>ProMows project enquiries</small></span><span aria-hidden>+</span></summary>
           <div className="pm-enquiry-body"><p>Your lawn. Your plans. Start with your city, property type and the work you have in mind.</p><a className="pm-primary" href={`mailto:${site.email}?subject=ProMows%20property%20enquiry`}>Email ProMows →</a><a href={`mailto:${site.email}`}>{site.email}</a><small>Service availability, scope and pricing are confirmed directly. Email opens a draft for you to send.</small></div>
