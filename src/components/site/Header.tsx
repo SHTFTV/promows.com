@@ -19,7 +19,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/70 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+    <header className="pm-site-header sticky top-0 z-40 border-b border-border/70 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/70">
       {/* Top strip: PlowWow partner cross-link, always visible */}
       <div className="bg-[color:var(--topbar-bg)] text-[color:var(--topbar-foreground)] text-xs">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2">

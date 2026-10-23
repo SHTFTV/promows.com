@@ -5,7 +5,7 @@ export function PartnerCallout({ compact = false }: { compact?: boolean }) {
   return (
     <section
       aria-labelledby="partner-callout-heading"
-      className="relative overflow-hidden bg-[color:var(--partner)] text-[color:var(--partner-foreground)]"
+      className="pm-winter-callout relative overflow-hidden bg-[color:var(--partner)] text-[color:var(--partner-foreground)]"
     >
       <div className={`mx-auto max-w-7xl px-4 ${compact ? "py-10" : "py-16"}`}>
         <div className="grid items-center gap-8 md:grid-cols-[1fr_auto]">

@@ -60,7 +60,7 @@ export const Route = createFileRoute("/blog/")({
       ],
     };
   },
-  errorComponent: ({ error }) => <div className="p-8" role="alert">{error.message}</div>,
+  errorComponent: ({ error }) => <div className="p-8" role="alert">{error instanceof Error ? error.message : "This page could not be loaded."}</div>,
   notFoundComponent: () => <div className="p-8">No posts yet.</div>,
   component: BlogIndex,
 });

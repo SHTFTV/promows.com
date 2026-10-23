@@ -1,3 +1,4 @@
+import {ProMowsBand} from '@/components/site/ProMowsBand';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -37,7 +38,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: { error: unknown; reset: () => void }) {
   console.error(error);
   const router = useRouter();
 
@@ -230,6 +231,7 @@ function RootComponent() {
         <main className="flex-1">
           <Outlet />
         </main>
+        <ProMowsBand kind="pros"/>
         <Footer />
       </div>
     </QueryClientProvider>

@@ -1,3 +1,4 @@
+import {ProMowsBand} from '@/components/site/ProMowsBand';
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
@@ -106,7 +107,7 @@ function HomePage() {
         </details>
       </aside>
       {/* FOUNDING NEIGHBORHOOD OFFER */}
-      <section className="border-y border-primary/20 bg-gradient-to-r from-primary via-primary to-primary/90 text-primary-foreground">
+      <section className="pm-founding border-y border-primary/20 bg-gradient-to-r from-primary via-primary to-primary/90 text-primary-foreground">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-4 py-10 text-center md:flex-row md:justify-between md:text-left">
           <div className="flex items-center gap-4">
             <span className="inline-flex items-center rounded-full bg-background/15 px-3 py-1 text-xs font-bold uppercase tracking-wider ring-1 ring-background/30">
@@ -171,6 +172,7 @@ function HomePage() {
       </section>
 
       {/* HOW IT WORKS */}
+      <ProMowsBand kind="lawn"/>
       <section className="bg-accent/30 py-20">
         <div className="mx-auto max-w-7xl px-4">
           <h2 className="font-heading text-3xl font-extrabold md:text-4xl">How it works</h2>
@@ -192,6 +194,7 @@ function HomePage() {
         </div>
       </section>
 
+      <ProMowsBand kind="garden"/>
       <section className="pm-journal" aria-labelledby="pm-journal-title"><div className="pm-journal-head"><div><p className="pm-eyebrow">Notes from the growing season</p><h2 id="pm-journal-title">A better-looking yard starts here.</h2><p>Latest article published: {new Date(Math.max(...posts.map(p => Date.parse(p.publishedAt)))).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric',timeZone:'UTC'})}</p></div><Link to="/blog">All lawn care articles →</Link></div><div className="pm-journal-grid">{[...posts].sort((a,b)=>b.publishedAt.localeCompare(a.publishedAt)).slice(0,4).map((post,i)=><article key={post.slug}><div className={`pm-topic pm-topic-${i}`} aria-label={post.tags.join(', ')}>{["✂","❧","☀","♧"][i]}<span>{post.tags[0]}</span></div><div className="pm-journal-copy"><time dateTime={post.publishedAt}>{new Date(post.publishedAt+'T12:00:00Z').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric',timeZone:'UTC'})}</time><h3><Link to="/blog/$slug" params={{slug:post.slug}}>{post.title}</Link></h3><p>{post.excerpt}</p><Link to="/blog/$slug" params={{slug:post.slug}}>Read the guide →</Link></div></article>)}</div><small>Topic illustrations are editorial graphics, not project photographs.</small></section>
       <PartnerCallout />
 

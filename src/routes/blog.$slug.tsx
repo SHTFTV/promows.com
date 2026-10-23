@@ -84,7 +84,7 @@ export const Route = createFileRoute("/blog/$slug")({
       ],
     };
   },
-  errorComponent: ({ error }) => <div className="p-8" role="alert">{error.message}</div>,
+  errorComponent: ({ error }) => <div className="p-8" role="alert">{error instanceof Error ? error.message : "This page could not be loaded."}</div>,
   notFoundComponent: () => (
     <div className="mx-auto max-w-3xl px-4 py-24 text-center">
       <h1 className="font-heading text-4xl font-extrabold">Post not found</h1>
