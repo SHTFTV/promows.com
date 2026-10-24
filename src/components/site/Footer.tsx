@@ -89,6 +89,6 @@ export function Footer() {
           </p>
         </div>
       </div>
-    </footer>
+    <div data-iam-credit="true" style={{boxSizing:"border-box",width:"100%",gridColumn:"1 / -1",padding:"16px 24px",textAlign:"center",fontSize:"12px",lineHeight:1.5,color:"inherit"}}>Powered by <a href="https://industryarmymarketing.com/" style={{color:"inherit",textDecoration:"underline",textUnderlineOffset:"3px"}}>Industry Army Marketing</a></div></footer>
   );
 }
